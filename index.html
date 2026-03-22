@@ -2759,7 +2759,7 @@ body.theme-bonbon {
       <hr>
       <p>Créé par <strong>Leroy Aurélien</strong></p>
       <p>© 2026 — Tous droits réservés</p>
-      <p>Version — 1.5</p>
+      <p>Version — 1.6</p>
     </div>
   </div>
 </div>
@@ -3832,7 +3832,7 @@ function showCalendarSection() {
   document.getElementById('conseils-section').classList.add('hidden');
   document.getElementById('btnModeToggle').textContent = '🌱 Mes Semis';
   document.getElementById('btnModeToggle').setAttribute('data-next', 'semis');
-  document.getElementById('app-title').textContent = '📅 Mon Calendrier Potager';
+  document.getElementById('app-title').textContent = '📅 |P|O|T|A| 📅';
   currentMonth = null;
   renderCalendar();
 }
@@ -3855,7 +3855,7 @@ function showConseilsSection() {
   document.getElementById('month-view').classList.add('hidden');
   document.getElementById('semis-section').classList.add('hidden');
   document.getElementById('conseils-section').classList.remove('hidden');
-  document.getElementById('btnModeToggle').textContent = '📅 Mon Calendrier Potager';
+  document.getElementById('btnModeToggle').textContent = '📅 |P|O|T|A| 📅';
   document.getElementById('btnModeToggle').setAttribute('data-next', 'calendrier');
   loadConseilsList();
 }
