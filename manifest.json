@@ -1,0 +1,22 @@
+{
+  "name": "POTA",
+  "short_name": "POTA",
+  "description": "Calendrier potager interactif avec gestion des semis",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f7f0",
+  "theme_color": "#2d6a4f",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

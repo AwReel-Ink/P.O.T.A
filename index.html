@@ -1,0 +1,5081 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>|P|O|T|A|</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2d6a4f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+...
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --green-dark: #2d5016;
+  --green-mid: #4a7c23;
+  --green-light: #7cb342;
+  --green-pale: #c5e1a5;
+  --green-bg: #f1f8e9;
+  --earth: #5d4037;
+  --earth-light: #8d6e63;
+  --white: #ffffff;
+  --shadow: rgba(0,0,0,0.15);
+  --danger: #c62828;
+  --danger-light: #ef5350;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--green-bg);
+  min-height: 100vh;
+  color: #333;
+}
+
+/* === HEADER === */
+header {
+  background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 3px 10px var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:active { transform: scale(0.96); }
+
+.btn-primary {
+  background: var(--green-light);
+  color: white;
+}
+.btn-primary:hover { background: var(--green-mid); }
+
+.btn-secondary {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  backdrop-filter: blur(4px);
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.35); }
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+.btn-danger:hover { background: var(--danger-light); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--green-dark);
+  border: 2px solid var(--green-mid);
+}
+.btn-outline:hover { background: var(--green-pale); }
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}
+
+/* === CALENDRIER GRILLE === */
+#calendar-view {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.months-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.month-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 8px var(--shadow);
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 3px solid transparent;
+  position: relative;
+  min-height: 120px;
+}
+
+.month-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px var(--shadow);
+}
+
+/* === CURRENT MONTH - Variables par thème === */
+
+/* Défaut (vert potager) */
+:root {
+  --current-month-bg: #e8f5e9;
+  --current-month-shadow: rgba(76, 175, 80, 0.3);
+}
+
+body.theme-floral {
+  --current-month-bg: #fce4f3;
+  --current-month-shadow: rgba(214, 93, 177, 0.3);
+}
+
+body.theme-tropical {
+  --current-month-bg: #d3f9d8;
+  --current-month-shadow: rgba(55, 178, 77, 0.3);
+}
+
+body.theme-ocean {
+  --current-month-bg: #d0ebff;
+  --current-month-shadow: rgba(51, 154, 240, 0.3);
+}
+
+body.theme-automne {
+  --current-month-bg: #fff4e6;
+  --current-month-shadow: rgba(232, 89, 12, 0.3);
+}
+
+body.theme-nuit {
+  --current-month-bg: #1c2333;
+  --current-month-shadow: rgba(88, 166, 255, 0.3);
+}
+
+body.theme-zen {
+  --current-month-bg: #eef2ee;
+  --current-month-shadow: rgba(143, 170, 143, 0.3);
+}
+
+body.theme-noel {
+  --current-month-bg: #fde0dc;
+  --current-month-shadow: rgba(211, 47, 47, 0.3);
+}
+
+body.theme-muertos {
+  --current-month-bg: rgba(106, 27, 154, 0.25);
+  --current-month-shadow: rgba(171, 71, 188, 0.3);
+}
+
+body.theme-japon {
+  --current-month-bg: #ffebee;
+  --current-month-shadow: rgba(198, 40, 40, 0.3);
+}
+
+body.theme-amour {
+  --current-month-bg: #fce4ec;
+  --current-month-shadow: rgba(233, 30, 99, 0.3);
+}
+
+body.theme-espace {
+  --current-month-bg: rgba(13, 71, 161, 0.25);
+  --current-month-shadow: rgba(0, 229, 255, 0.3);
+}
+
+body.theme-medieval {
+  --current-month-bg: #efebe9;
+  --current-month-shadow: rgba(93, 64, 55, 0.3);
+}
+
+body.theme-bonbon {
+  --current-month-bg: #fce4ec;
+  --current-month-shadow: rgba(216, 27, 96, 0.3);
+}
+
+/* === Règle unique === */
+.month-card.current-month {
+  border-color: var(--green-mid);
+  background: linear-gradient(to bottom, var(--current-month-bg), var(--green-bg));
+  box-shadow: 0 4px 16px var(--current-month-shadow);
+  transform: scale(1.03);
+}
+
+.month-card.current-month:hover {
+  transform: scale(1.05);
+}
+
+.month-card.current-month:hover {
+  transform: scale(1.05);
+}
+
+.month-card .month-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.month-card.current-month .month-name::after {
+  content: '📍';
+  font-size: 0.8rem;
+}
+
+.month-card .event-count {
+  font-size: 0.75rem;
+  color: var(--earth-light);
+  margin-bottom: 8px;
+}
+
+.month-card .preview-list {
+  list-style: none;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.month-card .preview-list li {
+  padding: 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.month-card .preview-list li .period-tag {
+  font-weight: 700;
+  color: var(--green-mid);
+}
+
+.month-card .preview-more {
+  font-size: 0.75rem;
+  color: var(--earth-light);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* === VUE MOIS DÉTAIL === */
+#month-view {
+  display: none;
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+#month-view.active { display: block; }
+#calendar-view.hidden { display: none; }
+
+.month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.month-header h2 {
+  font-size: 1.6rem;
+  color: var(--green-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.month-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.event-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event-item {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 5px var(--shadow);
+  transition: all 0.2s;
+  position: relative;
+}
+
+.event-item:hover {
+  box-shadow: 0 3px 12px var(--shadow);
+}
+
+.event-item.checked {
+  opacity: 0.5;
+}
+
+.event-item.checked .event-text {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.event-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--green-mid);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.event-text {
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.event-text .period-tag {
+  font-weight: 700;
+  color: var(--green-mid);
+  margin-right: 4px;
+}
+
+.event-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.event-item.multi-checked {
+  background: var(--color-primary-light, #d4edda);
+  border-left: 4px solid var(--color-primary, #27ae60);
+}
+
+.event-item .multi-indicator {
+  font-size: 1.3em;
+  flex-shrink: 0;
+}
+
+/* Multi-select - Thèmes sombres */
+body.theme-nuit .event-item.multi-checked {
+  background: rgba(88, 166, 255, 0.2);
+  border-left: 4px solid #58a6ff;
+}
+
+body.theme-muertos .event-item.multi-checked {
+  background: rgba(171, 71, 188, 0.25);
+  border-left: 4px solid #ab47bc;
+}
+
+body.theme-espace .event-item.multi-checked {
+  background: rgba(0, 229, 255, 0.2);
+  border-left: 4px solid #00e5ff;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.btn-icon:hover { background: #eee; }
+
+.empty-msg {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 0.95rem;
+}
+
+.multi-bar {
+  display: none;
+  background: var(--earth);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.multi-bar.active { display: flex; }
+
+.multi-bar span { font-weight: 600; }
+
+/* === MODAL === */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal h3 {
+  font-size: 1.2rem;
+  color: var(--green-dark);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--green-light);
+}
+
+.form-group textarea { resize: vertical; min-height: 70px; }
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+/* Move month modal */
+.move-modal select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin: 12px 0;
+}
+
+/* === MENU MOBILE === */
+.menu-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 150;
+}
+
+.menu-overlay.active { display: block; }
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -280px;
+  width: 280px;
+  height: 100%;
+  background: var(--white);
+  z-index: 151;
+  transition: right 0.3s;
+  box-shadow: -4px 0 20px var(--shadow);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.side-menu.active { right: 0; }
+
+.side-menu h3 {
+  color: var(--green-dark);
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--green-pale);
+}
+
+.side-menu .btn {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  header h1 { font-size: 1.1rem; }
+  .months-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .month-card { padding: 12px; min-height: 100px; }
+  #calendar-view, #month-view { padding: 14px; }
+}
+
+@media (max-width: 380px) {
+  .months-grid { grid-template-columns: 1fr; }
+}
+
+/* toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--green-dark);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  z-index: 300;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Confirm modal */
+.confirm-text {
+  font-size: 0.95rem;
+  margin: 10px 0 18px;
+  color: #555;
+}
+
+/* === NAVIGATION MOIS (flèches) === */
+#monthTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+#monthTitle span {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  min-width: 180px;
+  text-align: center;
+}
+
+.btn-nav {
+  background: var(--green-mid);
+  color: white;
+  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-nav:hover {
+  background: var(--green-dark);
+  transform: scale(1.1);
+}
+
+.btn-nav:active {
+  transform: scale(0.95);
+}
+
+/* === PARAMÈTRES MODAL === */
+.settings-modal {
+  max-width: 420px;
+}
+
+.settings-modal .form-group {
+  margin-bottom: 16px;
+}
+
+.theme-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 12px;
+  justify-content: center;
+  min-height: 48px;
+  font-size: 1.5rem;
+}
+
+.credits {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.credits strong {
+  color: var(--green-dark);
+}
+
+.credits hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 12px 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==============================
+   BOUTON MODE TOGGLE - HEADER
+   ============================== */
+
+.btn-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #e8f5d4 0%, #d4edba 100%);
+    color: #2d5016;
+    border: 2px solid #a8d47a;
+    border-radius: 25px;
+    padding: 8px 18px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(74, 124, 31, 0.15);
+    white-space: nowrap;
+}
+
+.btn-mode-toggle:hover {
+    background: linear-gradient(135deg, #d4edba 0%, #b8d990 100%);
+    box-shadow: 0 3px 10px rgba(74, 124, 31, 0.25);
+    transform: translateY(-1px);
+}
+
+.btn-mode-toggle:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 1px 4px rgba(74, 124, 31, 0.2);
+}
+
+/* Variantes selon le mode actif */
+.btn-mode-toggle[data-next="semis"] {
+    background: linear-gradient(135deg, #e8f5d4 0%, #d4edba 100%);
+    border-color: #a8d47a;
+    color: #2d5016;
+}
+
+.btn-mode-toggle[data-next="conseils"] {
+    background: linear-gradient(135deg, #fff3d4 0%, #ffe8a8 100%);
+    border-color: #e0c860;
+    color: #6b5a10;
+}
+
+.btn-mode-toggle[data-next="calendrier"] {
+    background: linear-gradient(135deg, #d4e8f5 0%, #b8d4ed 100%);
+    border-color: #7ab0d4;
+    color: #164a6b;
+}
+
+/* ==============================
+   CONSEILS - CONTENEUR PRINCIPAL
+   ============================== */
+
+#conseils-view {
+    padding-top: 70px;
+}
+
+/* ==============================
+   TAGS - BADGES COULEURS
+   ============================== */
+
+.conseil-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+    margin-bottom: 8px;
+}
+
+.conseil-tag-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    color: #666;
+}
+
+.conseil-tag-badge[data-tag="potager-semis"] {
+    background: rgba(61, 111, 46, 0.15);
+    color: #2d5016;
+    border-color: rgba(61, 111, 46, 0.35);
+}
+
+.conseil-tag-badge[data-tag="arbres-fleurs"] {
+    background: rgba(199, 80, 155, 0.12);
+    color: #8e3570;
+    border-color: rgba(199, 80, 155, 0.35);
+}
+
+.conseil-tag-badge[data-tag="entretien-sol"] {
+    background: rgba(200, 140, 0, 0.13);
+    color: #7a5500;
+    border-color: rgba(200, 140, 0, 0.35);
+}
+
+.conseil-tag-badge[data-tag="maladies-protection"] {
+    background: rgba(48, 92, 222, 0.12);
+    color: #243d8a;
+    border-color: rgba(48, 92, 222, 0.3);
+}
+
+.conseil-tag-badge[data-tag="calendrier-materiel"] {
+    background: rgba(160, 140, 60, 0.13);
+    color: #6b5c15;
+    border-color: rgba(160, 140, 60, 0.35);
+}
+
+/* ==============================
+   TAGS - BULLES SELECTIONNABLES (formulaires)
+   ============================== */
+
+.tags-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-cb-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    user-select: none;
+    border: 2px solid #ddd;
+    background: #f8f8f8;
+    color: #777;
+}
+
+.tag-cb-label input[type="checkbox"] {
+    display: none;
+}
+
+/* État sélectionné par tag */
+.tag-cb-label[data-tag="potager-semis"]:has(input:checked) {
+    background: rgba(61, 111, 46, 0.18);
+    color: #2d5016;
+    border-color: #4a7c1f;
+    box-shadow: 0 0 0 1px rgba(61, 111, 46, 0.2);
+}
+
+.tag-cb-label[data-tag="arbres-fleurs"]:has(input:checked) {
+    background: rgba(199, 80, 155, 0.14);
+    color: #8e3570;
+    border-color: #c7509b;
+    box-shadow: 0 0 0 1px rgba(199, 80, 155, 0.2);
+}
+
+.tag-cb-label[data-tag="entretien-sol"]:has(input:checked) {
+    background: rgba(200, 140, 0, 0.15);
+    color: #7a5500;
+    border-color: #c88c00;
+    box-shadow: 0 0 0 1px rgba(200, 140, 0, 0.2);
+}
+
+.tag-cb-label[data-tag="maladies-protection"]:has(input:checked) {
+    background: rgba(48, 92, 222, 0.14);
+    color: #243d8a;
+    border-color: #305cde;
+    box-shadow: 0 0 0 1px rgba(48, 92, 222, 0.2);
+}
+
+.tag-cb-label[data-tag="calendrier-materiel"]:has(input:checked) {
+    background: rgba(160, 140, 60, 0.15);
+    color: #6b5c15;
+    border-color: #a08c3c;
+    box-shadow: 0 0 0 1px rgba(160, 140, 60, 0.2);
+}
+
+/* Hover non sélectionné */
+.tag-cb-label:hover {
+    background: #eee;
+    border-color: #bbb;
+}
+
+/* ==============================
+   FILTRES BAR - BULLES COULEURS
+   ============================== */
+
+.filtre-tag-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    border: 2px solid #ddd;
+    background: #f5f5f5;
+    color: #777;
+}
+
+.filtre-tag-cb {
+    display: none;
+}
+
+.filtre-tag-label[data-tag="potager-semis"]:has(input:checked) {
+    background: rgba(61, 111, 46, 0.2);
+    color: #2d5016;
+    border-color: #4a7c1f;
+}
+
+.filtre-tag-label[data-tag="arbres-fleurs"]:has(input:checked) {
+    background: rgba(199, 80, 155, 0.15);
+    color: #8e3570;
+    border-color: #c7509b;
+}
+
+.filtre-tag-label[data-tag="entretien-sol"]:has(input:checked) {
+    background: rgba(200, 140, 0, 0.17);
+    color: #7a5500;
+    border-color: #c88c00;
+}
+
+.filtre-tag-label[data-tag="maladies-protection"]:has(input:checked) {
+    background: rgba(48, 92, 222, 0.15);
+    color: #243d8a;
+    border-color: #305cde;
+}
+
+.filtre-tag-label[data-tag="calendrier-materiel"]:has(input:checked) {
+    background: rgba(160, 140, 60, 0.17);
+    color: #6b5c15;
+    border-color: #a08c3c;
+}
+
+/* ==============================
+   CONSEILS CARDS - THÈME UNIFIÉ
+   ============================== */
+
+.conseils-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    padding: 14px 16px;
+}
+
+.conseil-card {
+    background: white;
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border-left: 4px solid #4a7c1f;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.conseil-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.conseil-card:active {
+    transform: scale(0.98);
+}
+
+.conseil-card-titre {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2d5016;
+    line-height: 1.3;
+}
+
+.conseil-card-extrait {
+    font-size: 0.83rem;
+    color: #666;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+/* ==============================
+   CONSEILS - MESSAGE VIDE
+   ============================== */
+
+/* MESSAGE VIDE */
+.empty-message {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 40px 20px;
+  grid-column: 1 / -1;
+}
+
+/* RESPONSIVE CONSEILS */
+@media (max-width: 600px) {
+  .conseils-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .conseils-filtres-bar {
+    padding: 8px 12px;
+  }
+
+  .conseil-detail-card,
+  .conseil-form-card {
+    padding: 14px;
+  }
+
+  .conseils-fab {
+    bottom: 16px;
+    right: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+}
+
+/* ==============================
+   SEMIS - STYLES
+   ============================== */
+
+/* ===== TOOLBAR ===== */
+.semis-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 0 5px;
+}
+
+.semis-tri {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.semis-tri label {
+    font-size: 0.9rem;
+    color: var(--text-secondary, #666);
+}
+
+.semis-tri select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #ddd);
+    background: var(--bg-card, #fff);
+    color: var(--text-primary, #333);
+    font-size: 0.9rem;
+}
+
+/* ===== LISTE DES BACS ===== */
+.semis-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.semis-card {
+    background: var(--bg-card, #fff);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border-left: 4px solid var(--color-primary, #4CAF50);
+}
+
+.semis-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.semis-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.semis-card-nom {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary, #333);
+}
+
+.semis-card-dimensions {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #888);
+    background: var(--bg-main, #f5f5f5);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.semis-card-lieu {
+    font-size: 0.9rem;
+    color: var(--text-secondary, #666);
+    margin-bottom: 8px;
+}
+
+.semis-card-lieu::before {
+    content: '📍 ';
+}
+
+.semis-card-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+}
+
+.semis-card-stat {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.semis-card-controle {
+    font-size: 0.91em;
+    font-weight: bolder;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid
+}
+
+/* ===== CENTRAGE SECTION SEMIS ===== */
+#semis-section {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ===== GRILLE ===== */
+.grille-container {
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.grille-table {
+    display: grid;
+    gap: 4px;
+    min-width: fit-content;
+}
+
+.grille-cell {
+    width: 70px;
+    min-height: 70px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 4px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.15s;
+    border: 2px solid transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.grille-cell:active {
+    transform: scale(0.93);
+}
+
+.grille-cell:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.grille-cell-numero {
+    font-size: 0.65rem;
+    font-weight: 700;
+    opacity: 0.7;
+    line-height: 1;
+    margin-bottom: 2px;
+    width: 100%;
+    text-align: center;
+}
+
+.grille-cell-nom {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    line-height: 1.2;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== ÉTATS & COULEURS ===== */
+.etat-attente {
+    background-color: #4A3728;
+    color: #fff;
+    border-color: #2C1E14;
+}
+
+.etat-leve {
+    background-color: #4CAF50;
+    color: #fff;
+    border-color: #388E3C;
+}
+
+.etat-repique {
+    background-color: #9C27B0;
+    color: #fff;
+    border-color: #7B1FA2;
+}
+
+.etat-replante {
+    background-color: #42A5F5;
+    color: #fff;
+    border-color: #1E88E5;
+}
+
+.etat-deplace {
+    background-color: #FF9800;
+    color: #fff;
+    border-color: #F57C00;
+}
+
+.etat-mort {
+    background-color: #000000;
+    color: #ccc;
+    border-color: #1b1b1b;
+}
+
+/* ===== LEGENDE ===== */
+.grille-legende {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.legende-item {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ===== DETAIL VIEW ===== */
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.detail-header h2 {
+    flex: 1;
+    margin: 0;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.detail-lieu {
+    font-size: 0.95rem;
+    color: var(--text-secondary, #666);
+    margin-bottom: 16px;
+    padding: 6px 12px;
+    background: var(--bg-main, #f0f0f0);
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.detail-lieu::before {
+    content: '📍 ';
+}
+
+.detail-section {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: var(--bg-card, #fff);
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.detail-section h3 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+}
+
+/* ===== ARROSAGE ===== */
+#detail-semis-dernier-arrosage,
+#detail-semis-prochain-arrosage {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.highlight {
+    color: var(--color-primary, #4CAF50);
+    font-weight: 700;
+}
+
+/* ===== HISTORIQUE ===== */
+.historique-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.historique-entry {
+    padding: 10px 12px;
+    border-left: 3px solid var(--color-primary, #4CAF50);
+    margin-bottom: 8px;
+    background: var(--bg-main, #f9f9f9);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.85rem;
+}
+
+.historique-entry-date {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.historique-entry-details {
+    color: var(--text-secondary, #666);
+}
+
+/* ===== FORMULAIRES ===== */
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.grid-names-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.grid-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.grid-name-row .cell-label {
+    min-width: 40px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #888);
+}
+
+.grid-name-row input {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color, #ddd);
+    background: var(--bg-card, #fff);
+    color: var(--text-primary, #333);
+    font-size: 0.85rem;
+}
+
+/* ===== BOUTONS ===== */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+.btn-lg {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.05rem;
+}
+
+.btn-danger {
+    background: #e53935;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px 14px;
+    font-weight: 600;
+}
+
+.btn-danger:hover {
+    background: #c62828;
+}
+
+.btn-header-left {
+    background: var(--color-primary, #4CAF50);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-header-left:hover {
+    background: var(--color-primary-dark, #388E3C);
+}
+
+/* ===== HEADER MODIFIÉ ===== */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    position: static;
+    gap : 10px;
+}
+
+.app-header h1 {
+    text-align: center;
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+/* ===== SEMIS VIEWS ===== */
+.semis-view {
+    padding: 10px 5px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 400px) {
+    .grille-cell {
+        width: 55px;
+        min-height: 55px;
+    }
+
+    .grille-cell-nom {
+        font-size: 0.6rem;
+    }
+
+    .semis-card-stats {
+        font-size: 0.75rem;
+    }
+
+    .btn-header-left {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* ===== CONTENEUR SCROLL GRILLE ===== */
+.grille-scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 14px;
+    scrollbar-width: auto;
+    scrollbar-color: var(--color-primary, #4CAF50) var(--bg-main, #e8e0d4);
+}
+
+.grille-scroll-container::-webkit-scrollbar {
+    height: 14px;
+}
+
+.grille-scroll-container::-webkit-scrollbar-track {
+    background: var(--bg-main, #e8e0d4);
+    border-radius: 10px;
+    margin: 0 4px;
+}
+
+.grille-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--color-primary, #4CAF50);
+    border-radius: 10px;
+    border: 3px solid var(--bg-main, #e8e0d4);
+    min-width: 60px;
+}
+
+.grille-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-dark, #388E3C);
+}
+
+/* ===== REPÈRES G / D ===== */
+.semis-grille-wrapper {
+    display: inline-block;
+    min-width: fit-content;
+    position: relative;
+}
+
+.semis-reperes {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 4px 0;
+    pointer-events: none;
+}
+
+.repere-g,
+.repere-d {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text-secondary, #888);
+    background: var(--bg-main, #f0f0f0);
+    padding: 2px 10px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* --- Thème Nuit --- */
+body.theme-nuit .grille-scroll-container {
+    scrollbar-color: #64b5f6 #0d1520;
+}
+body.theme-nuit .grille-scroll-container::-webkit-scrollbar-track {
+    background: #0d1520;
+}
+body.theme-nuit .grille-scroll-container::-webkit-scrollbar-thumb {
+    background: #64b5f6;
+    border-color: #0d1520;
+}
+body.theme-nuit .grille-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #42a5f5;
+}
+body.theme-nuit .repere-g,
+body.theme-nuit .repere-d {
+    color: #8899aa;
+    background: #0d1520;
+}
+
+/* --- Thème Muertos --- */
+body.theme-muertos .grille-scroll-container {
+    scrollbar-color: #e040fb #1a0e20;
+}
+body.theme-muertos .grille-scroll-container::-webkit-scrollbar-track {
+    background: #1a0e20;
+}
+body.theme-muertos .grille-scroll-container::-webkit-scrollbar-thumb {
+    background: #e040fb;
+    border-color: #1a0e20;
+}
+body.theme-muertos .grille-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #ce35e0;
+}
+body.theme-muertos .repere-g,
+body.theme-muertos .repere-d {
+    color: #aa88bb;
+    background: #1a0e20;
+}
+
+/* --- Thème Espace --- */
+body.theme-espace .grille-scroll-container {
+    scrollbar-color: #00e5ff #080c18;
+}
+body.theme-espace .grille-scroll-container::-webkit-scrollbar-track {
+    background: #080c18;
+}
+body.theme-espace .grille-scroll-container::-webkit-scrollbar-thumb {
+    background: #00e5ff;
+    border-color: #080c18;
+}
+body.theme-espace .grille-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #00b8d4;
+}
+body.theme-espace .repere-g,
+body.theme-espace .repere-d {
+    color: #6688aa;
+    background: #080c18;
+}
+
+/* ==============================
+   SEMIS - ADAPTATION THÈMES
+   ============================== */
+
+/* --- Mapping variables manquantes via les variables thèmes existantes --- */
+:root {
+    --bg-card: var(--white, #fff);
+    --bg-main: var(--green-pale, #f5f5f5);
+    --text-primary: var(--green-dark, #333);
+    --text-secondary: var(--green-mid, #666);
+    --color-primary: var(--green-mid, #4CAF50);
+    --color-primary-dark: var(--green-dark, #388E3C);
+    --border-color: var(--green-pale, #ddd);
+}
+
+/* --- Thème Nuit --- */
+body.theme-nuit .semis-card,
+body.theme-nuit .detail-section {
+    background: #1a2332;
+    color: #c8d8e8;
+}
+body.theme-nuit .semis-card {
+    border-left-color: #64b5f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+body.theme-nuit .semis-card-nom,
+body.theme-nuit .detail-header h2 {
+    color: #e0e8f0;
+}
+body.theme-nuit .semis-card-dimensions,
+body.theme-nuit .detail-lieu {
+    background: #0d1520;
+    color: #8899aa;
+}
+body.theme-nuit .semis-card-lieu,
+body.theme-nuit .semis-card-stats,
+body.theme-nuit .semis-tri label,
+body.theme-nuit .historique-entry-details {
+    color: #8899aa;
+}
+body.theme-nuit .semis-tri select,
+body.theme-nuit .grid-name-row input {
+    background: #0d1520;
+    color: #c8d8e8;
+    border-color: #2a3a4a;
+}
+body.theme-nuit .historique-entry {
+    background: #0d1520;
+    border-left-color: #64b5f6;
+}
+body.theme-nuit .highlight {
+    color: #64b5f6;
+}
+body.theme-nuit .btn-header-left {
+    background: #1565c0;
+}
+body.theme-nuit .btn-header-left:hover {
+    background: #0d47a1;
+}
+
+/* --- Thème Muertos --- */
+body.theme-muertos .semis-card,
+body.theme-muertos .detail-section {
+    background: #2a1a2e;
+    color: #f0e6ff;
+}
+body.theme-muertos .semis-card {
+    border-left-color: #e040fb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+body.theme-muertos .semis-card-nom,
+body.theme-muertos .detail-header h2 {
+    color: #f5e6ff;
+}
+body.theme-muertos .semis-card-dimensions,
+body.theme-muertos .detail-lieu {
+    background: #1a0e20;
+    color: #aa88bb;
+}
+body.theme-muertos .semis-card-lieu,
+body.theme-muertos .semis-card-stats,
+body.theme-muertos .semis-tri label,
+body.theme-muertos .historique-entry-details {
+    color: #aa88bb;
+}
+body.theme-muertos .semis-tri select,
+body.theme-muertos .grid-name-row input {
+    background: #1a0e20;
+    color: #f0e6ff;
+    border-color: #4a2a5a;
+}
+body.theme-muertos .historique-entry {
+    background: #1a0e20;
+    border-left-color: #e040fb;
+}
+body.theme-muertos .highlight {
+    color: #e040fb;
+}
+body.theme-muertos .btn-header-left {
+    background: #ab47bc;
+}
+body.theme-muertos .btn-header-left:hover {
+    background: #8e24aa;
+}
+
+/* --- Thème Espace --- */
+body.theme-espace .semis-card,
+body.theme-espace .detail-section {
+    background: #0f1528;
+    color: #cce5ff;
+}
+body.theme-espace .semis-card {
+    border-left-color: #00e5ff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+body.theme-espace .semis-card-nom,
+body.theme-espace .detail-header h2 {
+    color: #e0f0ff;
+}
+body.theme-espace .semis-card-dimensions,
+body.theme-espace .detail-lieu {
+    background: #080c18;
+    color: #6688aa;
+}
+body.theme-espace .semis-card-lieu,
+body.theme-espace .semis-card-stats,
+body.theme-espace .semis-tri label,
+body.theme-espace .historique-entry-details {
+    color: #6688aa;
+}
+body.theme-espace .semis-tri select,
+body.theme-espace .grid-name-row input {
+    background: #080c18;
+    color: #cce5ff;
+    border-color: #1a2a4a;
+}
+body.theme-espace .historique-entry {
+    background: #080c18;
+    border-left-color: #00e5ff;
+}
+body.theme-espace .highlight {
+    color: #00e5ff;
+}
+body.theme-espace .btn-header-left {
+    background: #1565c0;
+}
+body.theme-espace .btn-header-left:hover {
+    background: #0d47a1;
+}
+
+/* ==============================
+   CONSEILS - GRILLE CARTES
+   ============================== */
+
+.conseils-filtres-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.filtres-label {
+  font-weight: 600;
+  color: #2d5016;
+  margin-right: 4px;
+}
+
+.filtre-tag-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f0f7e6;
+  border: 1px solid #c8e0a0;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filtre-tag-label:has(input:checked) {
+  background: #4a7c1f;
+  color: white;
+  border-color: #4a7c1f;
+}
+
+.filtre-tag-cb {
+  display: none;
+}
+
+.conseils-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.conseil-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border-left: 4px solid #4a7c1f;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.conseil-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.conseil-card:active {
+  transform: scale(0.98);
+}
+
+.conseil-card-titre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2d5016;
+  line-height: 1.3;
+}
+
+.conseil-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.conseil-tag-badge {
+  background: #e8f5d4;
+  color: #3a6b14;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.conseil-card-extrait {
+  font-size: 0.88rem;
+  color: #666;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* BOUTON FAB */
+.conseils-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #4a7c1f;
+  color: white;
+  font-size: 1.8rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(74,124,31,0.4);
+  cursor: pointer;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.conseils-fab:hover {
+  background: #3a6b14;
+  transform: scale(1.1);
+}
+
+/* VUE DETAIL */
+.conseil-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--green-bg, #f5f5f0);
+  z-index: 50;
+  overflow-y: auto;
+  padding: 70px 16px 16px 16px;
+}
+
+.conseil-view.hidden {
+  display: none;
+}
+
+.conseil-detail-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.conseil-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.conseil-detail-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.conseil-detail-card h2 {
+  color: #2d5016;
+  margin: 0 0 12px 0;
+  font-size: 1.4rem;
+}
+
+.conseil-detail-texte {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.conseil-detail-lien a {
+  color: #4a7c1f;
+  font-weight: 500;
+}
+
+.conseil-detail-source {
+  color: #888;
+  font-size: 0.85rem;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+.conseil-detail-date {
+  color: #aaa;
+  font-size: 0.8rem;
+  margin-top: 12px;
+}
+
+/* FORMULAIRES CONSEILS */
+.conseil-form-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.conseil-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.conseil-form-header h3 {
+  margin: 0;
+  color: #2d5016;
+}
+
+  .conseil-detail-card,
+  .conseil-form-card {
+    padding: 14px;
+  }
+
+  .conseils-fab {
+    bottom: 16px;
+    right: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+
+  /* ==============================
+   CONSEILS - THÈMES
+   ============================== */
+
+.conseil-form-card {
+  background: var(--green-light, white);
+  border-radius: 14px;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.conseil-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.conseil-form-header h3 {
+  margin: 0;
+  color: var(--green-dark, #2d5016);
+}
+
+.conseil-form-card label {
+  color: var(--green-dark, #2d5016);
+}
+
+.conseil-form-card input,
+.conseil-form-card textarea,
+.conseil-form-card select {
+  background: var(--green-bg, #fff);
+  color: var(--green-dark, #333);
+  border: 1px solid var(--green-mid, #8faa8f);
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.conseil-form-card .btn-primary {
+  background: var(--green-mid, #4a7c1f);
+  color: #fff;
+}
+
+.conseil-detail-card {
+  background: var(--green-light, white) !important;
+  color: var(--green-dark, #333) !important;
+}
+
+.conseil-detail-card h2 {
+  color: var(--green-dark, #2d5016) !important;
+}
+
+.conseil-detail-texte {
+  background: var(--green-bg, #f8faf5) !important;
+  color: var(--green-dark, #333) !important;
+  border: 1px solid var(--green-mid, #c8e0a0);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 16px 0;
+}
+
+.conseil-detail-source,
+.conseil-detail-date {
+  color: var(--green-dark, #888) !important;
+  opacity: 0.7;
+}
+
+.conseil-detail-lien a {
+  color: var(--green-mid, #4a7c1f) !important;
+}
+
+.conseil-card {
+  background: var(--green-light, white);
+  border-left-color: var(--green-mid, #4a7c1f);
+}
+
+.conseil-card-titre {
+  color: var(--green-dark, #2d5016);
+}
+
+.filtres-label {
+  color: var(--green-dark, #2d5016);
+}
+
+.filtre-tag-label {
+  background: var(--green-light, #f0f7e6);
+  border-color: var(--green-mid, #c8e0a0);
+}
+
+.filtre-tag-label:has(input:checked) {
+  background: var(--green-mid, #4a7c1f);
+  color: white;
+  border-color: var(--green-mid, #4a7c1f);
+}
+
+.conseils-fab {
+  background: var(--green-mid, #4a7c1f);
+}
+
+.conseils-fab:hover {
+  background: var(--green-dark, #3a6b14);
+}
+
+/* Thèmes sombres - Conseils */
+body.theme-nuit .conseil-form-card,
+body.theme-nuit .conseil-detail-card,
+body.theme-nuit .conseil-card {
+  background: #161b22 !important;
+  border-color: #30363d;
+  color: #c9d1d9 !important;
+}
+
+body.theme-nuit .conseil-detail-texte,
+body.theme-nuit .conseil-form-card textarea,
+body.theme-nuit .conseil-form-card input,
+body.theme-nuit .conseil-form-card select {
+  background: #0d1117 !important;
+  color: #c9d1d9 !important;
+  border-color: #30363d !important;
+}
+
+body.theme-nuit .conseil-detail-card h2,
+body.theme-nuit .conseil-card-titre,
+body.theme-nuit .conseil-form-header h3,
+body.theme-nuit .conseil-form-card label {
+  color: #58a6ff !important;
+}
+
+body.theme-nuit .conseil-detail-source,
+body.theme-nuit .conseil-detail-date {
+  color: #8b949e !important;
+}
+
+body.theme-muertos .conseil-form-card,
+body.theme-muertos .conseil-detail-card,
+body.theme-muertos .conseil-card {
+  background: #2a2a3e !important;
+  border-color: #ab47bc44;
+  color: #f0e6ff !important;
+}
+
+body.theme-muertos .conseil-detail-texte,
+body.theme-muertos .conseil-form-card textarea,
+body.theme-muertos .conseil-form-card input,
+body.theme-muertos .conseil-form-card select {
+  background: #1a1a2e !important;
+  color: #f0e6ff !important;
+  border-color: #ab47bc44 !important;
+}
+
+body.theme-muertos .conseil-detail-card h2,
+body.theme-muertos .conseil-card-titre,
+body.theme-muertos .conseil-form-header h3,
+body.theme-muertos .conseil-form-card label {
+  color: #ce93d8 !important;
+}
+
+body.theme-muertos .conseil-detail-source,
+body.theme-muertos .conseil-detail-date {
+  color: #b39ddb !important;
+}
+
+body.theme-espace .conseil-form-card,
+body.theme-espace .conseil-detail-card,
+body.theme-espace .conseil-card {
+  background: #0f1528 !important;
+  border-color: #1565c044;
+  color: #cce5ff !important;
+}
+
+body.theme-espace .conseil-detail-texte,
+body.theme-espace .conseil-form-card textarea,
+body.theme-espace .conseil-form-card input,
+body.theme-espace .conseil-form-card select {
+  background: #0a0e1a !important;
+  color: #cce5ff !important;
+  border-color: #1565c044 !important;
+}
+
+body.theme-espace .conseil-detail-card h2,
+body.theme-espace .conseil-card-titre,
+body.theme-espace .conseil-form-header h3,
+body.theme-espace .conseil-form-card label {
+  color: #64b5f6 !important;
+}
+
+body.theme-espace .conseil-detail-source,
+body.theme-espace .conseil-detail-date {
+  color: #90caf9 !important;
+}
+
+/* ===== PAGE SAUVEGARDES - THÉMÉE ===== */
+.page-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1999;
+}
+.page-overlay.active { display: block; }
+
+.data-page {
+    display: none;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--green-bg, #fff);
+    border-radius: 16px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 2000;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    color: var(--green-dark, #333);
+}
+.data-page.active { display: block; }
+
+.data-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--green-mid, #4CAF50);
+}
+.data-page-header h2 {
+    margin: 0;
+    font-size: 1.2em;
+    color: var(--green-dark, #333);
+}
+.data-page-header .btn-close {
+    background: var(--green-light, #f5f5f5);
+    border: 1px solid var(--green-mid, #ddd);
+    color: var(--green-dark, #333);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.data-page-header .btn-close:hover {
+    background: var(--green-mid, #4CAF50);
+    color: #fff;
+}
+
+.data-page-content h3 {
+    margin: 14px 0 8px;
+    font-size: 0.95em;
+    color: var(--green-mid, #4CAF50);
+    font-weight: 700;
+}
+.data-page-content hr {
+    border: none;
+    border-top: 1px solid var(--green-mid, #ddd);
+    margin: 14px 0;
+    opacity: 0.3;
+}
+.data-page-content .btn-outline {
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 10px 14px;
+    border: 2px solid var(--green-mid, #4CAF50);
+    border-radius: 10px;
+    background: var(--green-light, #f5f5f5);
+    color: var(--green-dark, #333);
+    font-weight: 600;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.data-page-content .btn-outline:hover {
+    background: var(--green-mid, #4CAF50);
+    color: #fff;
+}
+
+/* === Thèmes sombres : surcharges data-page === */
+body.theme-nuit .data-page {
+    background: #1c2333;
+    color: #c9d1d9;
+}
+body.theme-nuit .data-page-header .btn-close {
+    background: #161b22;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+body.theme-nuit .data-page-content .btn-outline {
+    background: #161b22;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+body.theme-nuit .data-page-content .btn-outline:hover {
+    background: #58a6ff;
+    color: #0d1117;
+}
+
+body.theme-muertos .data-page {
+    background: #2a2a3e;
+    color: #f0e6ff;
+}
+body.theme-muertos .data-page-header .btn-close {
+    background: #1a1a2e;
+    border-color: #ab47bc44;
+    color: #f0e6ff;
+}
+body.theme-muertos .data-page-content .btn-outline {
+    background: rgba(106, 27, 154, 0.15);
+    border-color: #ab47bc44;
+    color: #f0e6ff;
+}
+body.theme-muertos .data-page-content .btn-outline:hover {
+    background: #ab47bc;
+    color: #fff;
+}
+
+body.theme-espace .data-page {
+    background: #0f1528;
+    color: #cce5ff;
+}
+body.theme-espace .data-page-header .btn-close {
+    background: #0a0e1a;
+    border-color: #1565c044;
+    color: #cce5ff;
+}
+body.theme-espace .data-page-content .btn-outline {
+    background: rgba(13, 71, 161, 0.15);
+    border-color: #1565c044;
+    color: #cce5ff;
+}
+body.theme-espace .data-page-content .btn-outline:hover {
+    background: #1565c0;
+    color: #fff;
+}
+
+/* ===== TOOLBAR CONSEILS - THÉMÉE ===== */
+.conseils-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.conseils-tri {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.conseils-tri select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #ccc);
+    background: var(--bg-card, #fff);
+    color: var(--text-primary, #333);
+    font-size: 0.9em;
+}
+
+/* ====================================== THÈMES ====================================== */
+
+/* Floral */
+body.theme-floral {
+  --green-dark: #b5338a;
+  --green-mid: #d65db1;
+  --green-light: #fce4f3;
+  --green-bg: #fdf2f8;
+  --green-accent: #ff6f91;
+}
+
+/* Tropical */
+body.theme-tropical {
+  --green-dark: #1b7a3d;
+  --green-mid: #37b24d;
+  --green-light: #d3f9d8;
+  --green-bg: #f0fff4;
+  --green-accent: #ffd43b;
+}
+
+/* Océan */
+body.theme-ocean {
+  --green-dark: #1864ab;
+  --green-mid: #339af0;
+  --green-light: #d0ebff;
+  --green-bg: #f0f7ff;
+  --green-accent: #22b8cf;
+}
+
+/* Automne */
+body.theme-automne {
+  --green-dark: #c2410c;
+  --green-mid: #e8590c;
+  --green-light: #fff4e6;
+  --green-bg: #fffaf5;
+  --green-accent: #ffa94d;
+}
+
+/* Nuit étoilée */
+body.theme-nuit {
+  --green-dark: #c9d1d9;
+  --green-mid: #58a6ff;
+  --green-light: #1c2333;
+  --green-bg: #0d1117;
+  --green-accent: #f0883e;
+}
+
+body.theme-nuit {
+  background: var(--green-bg);
+  color: #c9d1d9;
+}
+
+body.theme-nuit header {
+  background: linear-gradient(135deg, #161b22 0%, #1c2333 100%);
+}
+
+body.theme-nuit .month-card {
+  background: #161b22;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+body.theme-nuit .month-card:hover {
+  border-color: #58a6ff;
+}
+
+body.theme-nuit .modal {
+  background: #1c2333;
+  color: #c9d1d9;
+}
+
+body.theme-nuit .modal-overlay {
+  background: rgba(0,0,0,0.7);
+}
+
+body.theme-nuit .side-menu {
+  background: #161b22;
+  color: #c9d1d9;
+}
+
+body.theme-nuit .event-item {
+  background: #161b22;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+body.theme-nuit .btn-outline {
+  color: #58a6ff;
+  border-color: #30363d;
+}
+
+body.theme-nuit .btn-outline:hover {
+  background: #1c2333;
+}
+
+body.theme-nuit select,
+body.theme-nuit textarea,
+body.theme-nuit input {
+  background: #0d1117;
+  color: #c9d1d9;
+  border-color: #30363d;
+}
+
+body.theme-nuit .credits strong {
+  color: #58a6ff;
+}
+
+body.theme-nuit .month-header {
+  border-color: #30363d;
+}
+
+body.theme-nuit .period-tag {
+  background: #30363d;
+  color: #c9d1d9;
+}
+
+body.theme-nuit .multi-bar {
+  background: #161b22;
+  border-color: #30363d;
+}
+
+body.theme-nuit .theme-preview {
+  background: rgba(255,255,255,0.05);
+}
+
+/* Zen */
+body.theme-zen {
+  --green-dark: #5c6b5e;
+  --green-mid: #8faa8f;
+  --green-light: #eef2ee;
+  --green-bg: #f7f9f7;
+  --green-accent: #a0b89e;
+}
+
+/* Noël */
+body.theme-noel {
+  --green-dark: #a1200a;
+  --green-mid: #d32f2f;
+  --green-light: #fde0dc;
+  --green-bg: #fdf5f3;
+  --green-accent: #2e7d32;
+}
+
+/* Día de los Muertos */
+body.theme-muertos {
+  --green-dark: #6a1b9a;
+  --green-mid: #ab47bc;
+  --green-light: #f3e5f5;
+  --green-bg: #1a1a2e;
+  --green-accent: #fdd835;
+}
+body.theme-muertos,
+body.theme-muertos .month-card,
+body.theme-muertos .modal,
+body.theme-muertos .side-menu {
+  color: #f0e6ff;
+}
+body.theme-muertos .month-card {
+  background: rgba(106, 27, 154, 0.15);
+  border-color: #ab47bc44;
+}
+body.theme-muertos .event-list li {
+  background: rgba(106, 27, 154, 0.1);
+  border-color: #ab47bc33;
+}
+body.theme-muertos .modal {
+  background: #2a2a3e;
+}
+body.theme-muertos .side-menu {
+  background: #1a1a2e;
+}
+body.theme-muertos input,
+body.theme-muertos select,
+body.theme-muertos textarea {
+  background: #2a2a3e;
+  color: #f0e6ff;
+  border-color: #ab47bc44;
+}
+body.theme-muertos .credits {
+  color: #c0a0e0;
+}
+
+/* Japon */
+body.theme-japon {
+  --green-dark: #c62828;
+  --green-mid: #ef5350;
+  --green-light: #ffebee;
+  --green-bg: #fffaf5;
+  --green-accent: #f8bbd0;
+}
+
+/* Amour */
+body.theme-amour {
+  --green-dark: #c2185b;
+  --green-mid: #e91e63;
+  --green-light: #fce4ec;
+  --green-bg: #fff0f3;
+  --green-accent: #f06292;
+}
+
+/* Espace */
+body.theme-espace {
+  --green-dark: #0d47a1;
+  --green-mid: #1565c0;
+  --green-light: #1a237e;
+  --green-bg: #0a0e1a;
+  --green-accent: #00e5ff;
+}
+body.theme-espace,
+body.theme-espace .month-card,
+body.theme-espace .modal,
+body.theme-espace .side-menu {
+  color: #cce5ff;
+}
+body.theme-espace .month-card {
+  background: rgba(13, 71, 161, 0.15);
+  border-color: #1565c044;
+}
+body.theme-espace .event-list li {
+  background: rgba(13, 71, 161, 0.1);
+  border-color: #1565c033;
+}
+body.theme-espace .modal {
+  background: #0f1528;
+}
+body.theme-espace .side-menu {
+  background: #0a0e1a;
+}
+body.theme-espace input,
+body.theme-espace select,
+body.theme-espace textarea {
+  background: #0f1528;
+  color: #cce5ff;
+  border-color: #1565c044;
+}
+body.theme-espace .credits {
+  color: #6699cc;
+}
+
+/* Médiéval */
+body.theme-medieval {
+  --green-dark: #5d4037;
+  --green-mid: #8d6e63;
+  --green-light: #efebe9;
+  --green-bg: #faf6f0;
+  --green-accent: #ffb300;
+}
+
+/* Bonbon */
+body.theme-bonbon {
+  --green-dark: #d81b60;
+  --green-mid: #f48fb1;
+  --green-light: #fce4ec;
+  --green-bg: #fffde7;
+  --green-accent: #69f0ae;
+}
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+    <h1 id="app-title">📅 |P|O|T|A| 📅</h1>
+    <button class="btn-mode-toggle" id="btnModeToggle" onclick="cycleMode()">🌱 Mes Semis</button>
+    <button class="btn-header-left" onclick="openMenuPanel()">☰ Menu</button>
+</header>
+
+<!-- SIDE MENU -->
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenuPanel()"></div>
+<div class="side-menu" id="sideMenu">
+  <h3>🌿 Menu</h3>
+  <h4>➕ Créer</h4>
+  <button class="btn btn-outline" onclick="openAddEvent(); closeMenuPanel()">📅 Événement calendrier</button>
+  <button class="btn btn-outline" onclick="openCreationSemis(); closeMenuPanel()">🌱 Nouveau bac semis</button>
+  <button class="btn btn-outline" onclick="openCreationConseil(); closeMenuPanel()">💡 Nouveau conseil</button>
+  <hr>
+  <button class="btn btn-outline" onclick="openDataPage()">💾 Sauvegardes</button>
+  <button class="btn btn-outline" onclick="openSettings()">⚙️ Paramètres</button>
+</div>
+
+<!-- PAGE SAUVEGARDES -->
+<div class="page-overlay" id="dataPageOverlay" onclick="closeDataPage()"></div>
+<div class="data-page" id="dataPage">
+  <div class="data-page-header">
+    <h2>💾 Sauvegardes</h2>
+    <button class="btn-close" onclick="closeDataPage()">✕</button>
+  </div>
+  <div class="data-page-content">
+    <h3>📤 Partage entre jardiniers</h3>
+    <p style="font-size:0.8em;color:var(--text-secondary,#777);margin:0 0 8px;">Exporter/importer sans écraser (fusion)</p>
+    
+    <h4 style="margin:10px 0 6px;font-size:0.88em;color:var(--text-primary,#333);">🌱 Calendrier</h4>
+    <button class="btn btn-outline" onclick="exportData()">📤 Exporter</button>
+    <button class="btn btn-outline" onclick="triggerImport()">📥 Importer</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    
+    <h4 style="margin:10px 0 6px;font-size:0.88em;color:var(--text-primary,#333);">🌱 Semis</h4>
+    <button class="btn btn-outline" onclick="exportSemisData()">📤 Exporter</button>
+    <button class="btn btn-outline" onclick="document.getElementById('import-semis-file').click()">📥 Importer</button>
+    <input type="file" id="import-semis-file" accept=".json" class="hidden" onchange="importSemisData(event)">
+    
+    <h4 style="margin:10px 0 6px;font-size:0.88em;color:var(--text-primary,#333);">💡 Conseils</h4>
+    <button class="btn btn-outline" onclick="exportConseilsData()">📤 Exporter</button>
+    <button class="btn btn-outline" onclick="document.getElementById('import-conseils-file').click()">📥 Importer</button>
+    <input type="file" id="import-conseils-file" accept=".json" class="hidden" onchange="importConseilsData(event)">
+    
+    <hr>
+    <h3>🔒 Sauvegarde complète</h3>
+    <p style="font-size:0.8em;color:var(--text-secondary,#777);margin:0 0 8px;">Tout exporter / Tout restaurer (écrase les données)</p>
+    <button class="btn btn-outline" style="border-color:var(--color-primary);background:var(--color-primary);color:#fff;font-weight:700;" onclick="exportTotal()">📦 Export total</button>
+    <button class="btn btn-outline" style="border-color:#e74c3c;background:#e74c3c;color:#fff;font-weight:700;" onclick="document.getElementById('import-total-file').click()">🔄 Restauration totale</button>
+    <input type="file" id="import-total-file" accept=".json" class="hidden" onchange="importTotal(event)">
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- VUE CALENDRIER -->
+<div id="calendar-view" class="calendar-container">
+  <div class="months-grid" id="monthsGrid"></div>
+</div>
+
+<div id="calendarGrid" class="calendar-grid"></div>
+
+<!-- VUE MOIS DÉTAIL -->
+<div id="month-view" class="month-view">
+  <div class="month-header">
+    <div id="monthTitle"></div>
+    <div class="month-actions">
+      <button class="btn btn-primary btn-sm" onclick="openAddEventForMonth()">➕ Ajouter</button>
+      <button class="btn btn-outline btn-sm" id="btnMultiToggle" onclick="toggleMultiSelect()">☑ Sélection multiple</button>
+      <button class="btn btn-outline btn-sm" onclick="backToCalendar()">← Retour</button>
+    </div>
+  </div>
+  <div class="multi-bar" id="multiBar">
+    <span id="multiCount">0 sélectionné(s)</span>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary btn-sm" onclick="multiMove()">📦 Déplacer</button>
+      <button class="btn btn-danger btn-sm" onclick="multiDelete()">🗑 Supprimer</button>
+      <button class="btn btn-outline btn-sm" onclick="toggleMultiSelect()">✖ Annuler</button>
+    </div>
+  </div>
+  <ul class="event-list" id="eventList"></ul>
+</div>
+
+<!-- MODAL AJOUT / MODIF -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal">
+    <h3 id="modalTitle">➕ Nouvel événement</h3>
+    <div class="form-group">
+      <label for="evtMonth">Mois</label>
+      <select id="evtMonth"></select>
+    </div>
+    <div class="form-group">
+      <label for="evtPeriod">Période (optionnel)</label>
+      <select id="evtPeriod">
+        <option value="">— Aucune —</option>
+        <option value="deb">Début</option>
+        <option value="mi">Milieu</option>
+        <option value="fin">Fin</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="evtDesc">Description</label>
+      <textarea id="evtDesc" placeholder="Ex: Semer les tomates en godet..."></textarea>
+    </div>
+    <div class="modal-buttons">
+      <button class="btn btn-outline" onclick="closeEventModal()">Annuler</button>
+      <button class="btn btn-primary" id="btnSaveEvent" onclick="saveEvent()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DÉPLACER -->
+<div class="modal-overlay" id="moveModal">
+  <div class="modal move-modal">
+    <h3>📦 Déplacer vers</h3>
+    <select id="moveTarget"></select>
+    <div class="modal-buttons">
+      <button class="btn btn-outline" onclick="closeMoveModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="confirmMove()">Déplacer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMER -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h3 id="confirmTitle">⚠️ Confirmer</h3>
+    <p class="confirm-text" id="confirmText"></p>
+    <div class="modal-buttons">
+      <button class="btn btn-outline" onclick="closeConfirm()">Annuler</button>
+      <button class="btn btn-danger" id="btnConfirm" onclick="">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PARAMÈTRES -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal settings-modal">
+    <h3>⚙️ Paramètres</h3>
+    
+    <div class="form-group">
+      <label for="themeSelect">🎨 Thème</label>
+      <select id="themeSelect" onchange="changeTheme(this.value)">
+        <option value="potager">🥕 Potager (par défaut)</option>
+        <option value="floral">🌸 Floral</option>
+        <option value="tropical">🌴 Tropical</option>
+        <option value="ocean">🌊 Océan</option>
+        <option value="automne">🍂 Automne</option>
+        <option value="nuit">🌙 Nuit étoilée</option>
+        <option value="zen">🧘 Zen</option>
+        <option value="noel">🎄 Noël</option>
+        <option value="muertos">💀 Día de los Muertos</option>
+        <option value="japon">🎌 Japon</option>
+        <option value="amour">❤️ Amour</option>
+        <option value="espace">🚀 Espace</option>
+        <option value="medieval">⚔️ Médiéval</option>
+        <option value="bonbon">🍬 Bonbon</option>
+      </select>
+    </div>
+
+    <div class="theme-preview" id="themePreview"></div>
+
+    <div class="modal-buttons">
+      <button class="btn btn-primary" onclick="closeSettings()">Fermer</button>
+    </div>
+
+    <div class="credits">
+      <hr>
+      <p>Créé par <strong>Leroy Aurélien</strong></p>
+      <p>© 2026 — Tous droits réservés</p>
+      <p>Version — 1.5</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================
+     SECTION SEMIS (masquée par défaut)
+     ============================== -->
+<div id="semis-section" class="hidden">
+
+    <!-- LISTE DES BACS -->
+    <div id="semis-list-view" class="semis-view">
+        <div class="semis-toolbar">
+            <button class="btn btn-primary" onclick="openCreationSemis()">➕ Nouveau bac</button>
+            <div class="semis-tri">
+                <label>Trier par :</label>
+                <select id="semis-tri-select" onchange="loadSemisList()">
+                    <option value="nom">Nom</option>
+                    <option value="lieu">Lieu</option>
+                </select>
+            </div>
+        </div>
+        <div id="semis-list" class="semis-list"></div>
+    </div>
+
+    <!-- CREATION D'UN BAC -->
+    <div id="semis-creation-view" class="semis-view hidden">
+        <h2>Nouveau bac de semis</h2>
+        <form id="form-creation-semis">
+            <div class="form-group">
+                <label for="creation-semis-nom">Nom du bac *</label>
+                <input type="text" id="creation-semis-nom" required placeholder="Ex: Bac tomates">
+            </div>
+            <div class="form-group">
+                <label for="creation-semis-lieu">Lieu *</label>
+                <input type="text" id="creation-semis-lieu" required placeholder="Ex: Rebord fenêtre cuisine">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="creation-semis-lignes">Lignes *</label>
+                    <input type="number" id="creation-semis-lignes" min="1" max="20" value="3" required>
+                </div>
+                <div class="form-group">
+                    <label for="creation-semis-colonnes">Colonnes *</label>
+                    <input type="number" id="creation-semis-colonnes" min="1" max="20" value="4" required>
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline" onclick="previewGrilleCreation()">👁️ Aperçu grille</button>
+
+            <!-- Aperçu grille + noms -->
+            <div id="creation-grille-section" class="hidden">
+                <h3>Aperçu</h3>
+                <div class="grille-scroll-container">
+                    <div class="semis-grille-wrapper">
+                        <div id="creation-grille-preview" class="grille-container"></div>
+                        <div class="semis-reperes">
+                            <span class="repere-g">G</span>
+                            <span class="repere-d">D</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="creation-noms-section" class="hidden">
+                <h3>Nommer les godets</h3>
+                <div id="creation-semis-noms" class="grid-names-list"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" onclick="retourListeSemis()">Annuler</button>
+                <button type="submit" class="btn btn-primary">💾 Créer le bac</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- DETAIL D'UN BAC -->
+    <div id="semis-detail-view" class="semis-view hidden">
+        <div class="detail-header">
+            <button class="btn btn-outline btn-sm" onclick="retourListeSemis()">← Retour</button>
+            <h2 id="detail-semis-titre"></h2>
+            <div class="detail-actions">
+                <button class="btn btn-outline btn-sm" onclick="handleOpenModifierSemis()">✏️</button>
+                <button class="btn btn-danger btn-sm" onclick="handleSupprimerSemis()">🗑️</button>
+            </div>
+        </div>
+        <div id="detail-semis-lieu" class="detail-lieu"></div>
+
+        <!-- Grille interactive -->
+        <div class="detail-section">
+            <h3>🌱 Grille des godets</h3>
+            <div class="grille-legende">
+                <span class="legende-item etat-attente">Attente</span>
+                <span class="legende-item etat-leve">Levé, en Croissance</span>
+                <span class="legende-item etat-repique">Repiqué en Godet</span>
+                <span class="legende-item etat-replante">Planté en Terre</span>
+                <span class="legende-item etat-deplace">Déplacé Ailleurs</span>
+                <span class="legende-item etat-mort">☠️Mort💀</span>
+            </div>
+            <div class="grille-scroll-container">
+                <div class="semis-grille-wrapper">
+                    <div id="detail-semis-grille" class="grille-container"></div>
+                    <div class="semis-reperes">
+                        <span class="repere-g">G</span>
+                        <span class="repere-d">D</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arrosage -->
+        <div class="detail-section">
+            <h3>💧 Arrosage</h3>
+            <div id="detail-semis-dernier-arrosage"></div>
+            <div id="detail-semis-prochain-arrosage"></div>
+            <button class="btn btn-primary" id="btn-arroser-semis" onclick="handleArroserSemis()">💧 Arrosé aujourd'hui</button>
+        </div>
+
+        <!-- Historique -->
+        <div class="detail-section">
+            <h3>📋 Historique</h3>
+            <div id="detail-semis-historique" class="historique-list"></div>
+        </div>
+
+        <!-- Bouton enregistrer -->
+        <div class="detail-section">
+            <button class="btn btn-primary btn-lg" onclick="handleEnregistrerEntretienSemis()">💾 Enregistrer les modifications</button>
+        </div>
+      </div>
+
+    <!-- MODIFICATION D'UN BAC -->
+    <div id="semis-modifier-view" class="semis-view hidden">
+        <h2>Modifier le bac</h2>
+        <form id="form-modifier-semis">
+            <input type="hidden" id="modifier-semis-id">
+            <div class="form-group">
+                <label for="modifier-semis-nom">Nom du bac *</label>
+                <input type="text" id="modifier-semis-nom" required>
+            </div>
+            <div class="form-group">
+                <label for="modifier-semis-lieu">Lieu *</label>
+                <input type="text" id="modifier-semis-lieu" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="modifier-semis-lignes">Lignes</label>
+                    <input type="number" id="modifier-semis-lignes" min="1" max="20">
+                </div>
+                <div class="form-group">
+                    <label for="modifier-semis-colonnes">Colonnes</label>
+                    <input type="number" id="modifier-semis-colonnes" min="1" max="20">
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline" onclick="previewGrilleModification()">👁️ Aperçu grille</button>
+            <div id="modifier-grille-section" class="hidden">
+                <h3>Aperçu</h3>
+                <div id="modifier-grille-preview" class="grille-container"></div>
+            </div>
+            <div id="modifier-noms-section" class="hidden">
+                <h3>Nommer les godets</h3>
+                <div id="modifier-semis-noms" class="grid-names-list"></div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" onclick="openSemisDetail(currentSemisId)">Annuler</button>
+                <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<!-- ==============================
+     SECTION CONSEILS
+     ============================== -->
+<div id="conseils-section" class="hidden">
+
+  <!-- Dans #conseils-liste-view, AVANT la grille -->
+<div class="conseils-toolbar">
+    <button class="btn btn-primary" onclick="openCreationConseil()">➕ Nouveau conseil</button>
+</div>
+
+  <!-- BARRE FILTRES -->
+  <div class="conseils-filtres-bar">
+    <span class="filtres-label">Filtrer :</span>
+    <label class="filtre-tag-label" data-tag="potager-semis">
+        <input type="checkbox" class="filtre-tag-cb" value="potager-semis" onchange="loadConseilsList()"> 🥕 Potager & Semis
+    </label>
+    <label class="filtre-tag-label" data-tag="arbres-fleurs">
+        <input type="checkbox" class="filtre-tag-cb" value="arbres-fleurs" onchange="loadConseilsList()"> 🌳 Arbres & Fleurs
+    </label>
+    <label class="filtre-tag-label" data-tag="entretien-sol">
+        <input type="checkbox" class="filtre-tag-cb" value="entretien-sol" onchange="loadConseilsList()"> 🧹 Entretien & Sol
+    </label>
+    <label class="filtre-tag-label" data-tag="maladies-protection">
+        <input type="checkbox" class="filtre-tag-cb" value="maladies-protection" onchange="loadConseilsList()"> 🛡️ Maladies & Protection
+    </label>
+    <label class="filtre-tag-label" data-tag="calendrier-materiel">
+        <input type="checkbox" class="filtre-tag-cb" value="calendrier-materiel" onchange="loadConseilsList()"> 📅 Calendrier & Matériel
+    </label>
+  </div>
+
+  <!-- GRILLE DES CARTES CONSEILS -->
+  <div class="conseils-grid" id="conseilsGrid"></div>
+
+  <!-- VUE DETAIL -->
+  <div id="conseil-detail-view" class="conseil-view hidden">
+    <div class="conseil-detail-card">
+      <div class="conseil-detail-header">
+        <button class="btn btn-outline btn-sm" onclick="backToConseilsList()">← Retour</button>
+        <div class="conseil-detail-actions">
+          <button class="btn btn-primary btn-sm" onclick="openEditionConseil(currentConseilId)">✏️ Modifier</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteConseilConfirm(currentConseilId)">🗑 Supprimer</button>
+        </div>
+      </div>
+      <h2 id="detail-conseil-titre"></h2>
+      <div id="detail-conseil-tags"></div>
+      <div class="conseil-detail-texte" id="detail-conseil-texte"></div>
+      <div id="detail-conseil-lien" class="conseil-detail-lien"></div>
+      <div id="detail-conseil-source" class="conseil-detail-source"></div>
+      <div id="detail-conseil-date" class="conseil-detail-date"></div>
+    </div>
+  </div>
+
+  <!-- VUE CREATION -->
+  <div id="conseil-creation-view" class="conseil-view hidden">
+    <div class="conseil-form-card">
+      <div class="conseil-form-header">
+        <h3>➕ Nouveau conseil</h3>
+        <button class="btn btn-outline btn-sm" onclick="backToConseilsList()">← Retour</button>
+      </div>
+      <form id="form-creation-conseil" onsubmit="handleCreationConseil(event)">
+        <div class="form-group">
+          <label>Titre *</label>
+          <input type="text" id="conseil-titre" required maxlength="100" placeholder="Ex: Quand planter les tomates">
+        </div>
+        <div class="form-group">
+          <label>Contenu *</label>
+          <textarea id="conseil-texte" required rows="6" placeholder="Votre conseil ou astuce..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Catégories * (au moins une)</label>
+          <div class="tags-checkboxes">
+              <label class="tag-cb-label" data-tag="potager-semis">
+                  <input type="checkbox" class="creation-tag-cb" value="potager-semis"> 🥕 Potager & Semis
+              </label>
+              <label class="tag-cb-label" data-tag="arbres-fleurs">
+                  <input type="checkbox" class="creation-tag-cb" value="arbres-fleurs"> 🌳 Arbres & Fleurs
+              </label>
+              <label class="tag-cb-label" data-tag="entretien-sol">
+                  <input type="checkbox" class="creation-tag-cb" value="entretien-sol"> 🧹 Entretien & Sol
+              </label>
+              <label class="tag-cb-label" data-tag="maladies-protection">
+                  <input type="checkbox" class="creation-tag-cb" value="maladies-protection"> 🛡️ Maladies & Protection
+              </label>
+              <label class="tag-cb-label" data-tag="calendrier-materiel">
+                  <input type="checkbox" class="creation-tag-cb" value="calendrier-materiel"> 📅 Calendrier & Matériel
+              </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Lien utile (optionnel)</label>
+          <input type="url" id="conseil-lien" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>Source (optionnel)</label>
+          <input type="text" id="conseil-source" placeholder="Ex: Mon voisin jardinier">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">💾 Enregistrer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- VUE EDITION -->
+  <div id="conseil-edition-view" class="conseil-view hidden">
+    <div class="conseil-form-card">
+      <div class="conseil-form-header">
+        <h3>✏️ Modifier le conseil</h3>
+        <button class="btn btn-outline btn-sm" onclick="backToConseilsList()">← Retour</button>
+      </div>
+      <form id="form-edition-conseil" onsubmit="handleEditionConseil(event)">
+        <input type="hidden" id="edit-conseil-id">
+        <div class="form-group">
+          <label>Titre *</label>
+          <input type="text" id="edit-conseil-titre" required maxlength="100">
+        </div>
+        <div class="form-group">
+          <label>Contenu *</label>
+          <textarea id="edit-conseil-texte" required rows="6"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Catégories *</label>
+          <div class="tags-checkboxes">
+              <label class="tag-cb-label" data-tag="potager-semis">
+                  <input type="checkbox" class="edition-tag-cb" value="potager-semis"> 🥕 Potager & Semis
+              </label>
+              <label class="tag-cb-label" data-tag="arbres-fleurs">
+                  <input type="checkbox" class="edition-tag-cb" value="arbres-fleurs"> 🌳 Arbres & Fleurs
+              </label>
+              <label class="tag-cb-label" data-tag="entretien-sol">
+                  <input type="checkbox" class="edition-tag-cb" value="entretien-sol"> 🧹 Entretien & Sol
+              </label>
+              <label class="tag-cb-label" data-tag="maladies-protection">
+                  <input type="checkbox" class="edition-tag-cb" value="maladies-protection"> 🛡️ Maladies & Protection
+              </label>
+              <label class="tag-cb-label" data-tag="calendrier-materiel">
+                  <input type="checkbox" class="edition-tag-cb" value="calendrier-materiel"> 📅 Calendrier & Matériel
+              </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Lien utile (optionnel)</label>
+          <input type="url" id="edit-conseil-lien">
+        </div>
+        <div class="form-group">
+          <label>Source (optionnel)</label>
+          <input type="text" id="edit-conseil-source">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">💾 Sauvegarder</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ==================== CONFIG ====================
+const MONTHS = [
+  'Janvier','Février','Mars','Avril','Mai','Juin',
+  'Juillet','Août','Septembre','Octobre','Novembre','Décembre'
+];
+// ==================== THÈMES & ICÔNES ====================
+const THEME_ICONS = {
+  potager: ['🥕','🌱','🌿','🌷','🍓','🍅','🌻','🌽','🍇','🎃','🥬','❄️'],
+  floral:  ['💮','🌸','🌺','🌷','🌹','🌻','💐','🌼','🏵️','🍁','🌾','❄️'],
+  tropical:['🥥','🌴','🍃','🌺','🍍','🥭','🌿','🍌','🫒','🌾','🍂','🎄'],
+  ocean:   ['🐚','🐟','🐠','🦀','🐬','🐳','🌊','🦈','🐙','🦑','🫧','⛄'],
+  automne: ['🧣','🌨️','🌱','🌼','☀️','🌞','🌻','🍎','🍂','🎃','🍁','⛄'],
+  nuit:    ['🌙','✨','⭐','🌟','🪐','☄️','🌌','💫','🔭','🌠','🌑','❄️'],
+  zen:     ['🪨','🎋','🍃','🧘','☯️','🕊️','🪷','🌿','🍵','🪴','🕯️','❄️'],
+  noel: ['🎄','❄️','⛄','🎁','🕯️','🔔','🦌','🌟','🍪','☃️','🎅','🤶'],
+  muertos: ['💀','🌺','🕯️','💐','🦴','🎭','💜','🌙','🔮','🕸️','🌹','☠️'],
+  japon: ['🌸','🎌','⛩️','🗻','🎋','🍵','🏯','🎐','🍡','🍁','🐉','❄️'],
+  amour: ['💘','💝','🌹','💕','💗','💋','🥰','💌','❤️‍🔥','💐','💞','♥️'],
+  espace: ['🚀','🌍','🌙','⭐','🛸','☄️','🪐','👨‍🚀','🌌','🛰️','🌠','🌑'],
+  medieval: ['⚔️','🏰','🛡️','👑','🐴','🗡️','🏹','🐲','🔥','⚜️','🍷','🏳️'],
+  bonbon: ['🍬','🍭','🧁','🍩','🎂','🍪','🍰','🍫','🍡','🎀','🌈','⭐']
+};
+
+let currentTheme = localStorage.getItem('potager-theme') || 'potager';
+let MONTH_ICONS = THEME_ICONS[currentTheme];
+
+const PERIOD_ORDER = { 'deb': 0, 'mi': 1, 'fin': 2, '': 3 };
+const DB_NAME = 'PotagerCalendar';
+const STORE_NAME = 'events';
+const AUTO_UNCHECK_MONTHS = 3;
+
+let db;
+let currentMonth = null; // 0-11
+let multiSelectMode = false;
+let multiSelected = new Set();
+let editingEventId = null;
+
+// ==================== PARAMÈTRES ====================
+function openSettings() {
+  closeMenuPanel();
+  document.getElementById('themeSelect').value = currentTheme;
+  updateThemePreview();
+  document.getElementById('settingsModal').classList.add('active');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('active');
+}
+
+function openDataPage() {
+    closeMenuPanel();
+    document.getElementById('dataPageOverlay').classList.add('active');
+    document.getElementById('dataPage').classList.add('active');
+}
+
+function closeDataPage() {
+    document.getElementById('dataPageOverlay').classList.remove('active');
+    document.getElementById('dataPage').classList.remove('active');
+}
+
+function changeTheme(theme) {
+  // Retirer l'ancien thème
+  document.body.className = '';
+  
+  currentTheme = theme;
+  localStorage.setItem('potager-theme', theme);
+  
+  // Appliquer la classe si pas le thème par défaut
+  if (theme !== 'potager') {
+    document.body.classList.add('theme-' + theme);
+  }
+  
+  // Mettre à jour les icônes
+  MONTH_ICONS = THEME_ICONS[theme];
+  
+  // Mettre à jour la preview
+  updateThemePreview();
+  
+  // Rafraîchir l'affichage
+  if (currentMonth !== null) {
+    renderMonthView();
+  } else {
+    renderCalendar();
+  }
+  
+  toast('🎨 Thème appliqué : ' + document.getElementById('themeSelect').selectedOptions[0].text);
+}
+
+function updateThemePreview() {
+  const icons = THEME_ICONS[document.getElementById('themeSelect').value];
+  document.getElementById('themePreview').innerHTML = icons.map(i => `<span>${i}</span>`).join('');
+}
+
+// Appliquer le thème au chargement
+function applyStoredTheme() {
+  const theme = localStorage.getItem('potager-theme') || 'potager';
+  currentTheme = theme;
+  MONTH_ICONS = THEME_ICONS[theme];
+  if (theme !== 'potager') {
+    document.body.classList.add('theme-' + theme);
+  }
+}
+
+// ==================== INDEXED DB ====================
+// ===== REMPLACER la constante DB_VERSION =====
+const DB_VERSION = 3;
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+
+            // Stores existants (version 1)
+            if (!db.objectStoreNames.contains('events')) {
+                db.createObjectStore('events', { keyPath: 'id', autoIncrement: true });
+            }
+
+            // Nouveaux stores (version 2)
+            if (!db.objectStoreNames.contains('semis')) {
+                db.createObjectStore('semis', { keyPath: 'id', autoIncrement: true });
+            }
+            if (!db.objectStoreNames.contains('semisHistorique')) {
+                const store = db.createObjectStore('semisHistorique', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('semisId', 'semisId', { unique: false });
+            }
+            // Dans onupgradeneeded, ajouter :
+            if (!db.objectStoreNames.contains('conseils')) {
+              db.createObjectStore('conseils', { keyPath: 'id', autoIncrement: true });
+            }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function getAllEvents() {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = e => reject(e);
+  });
+}
+
+function getEventsByMonth(month) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const idx = store.index('month');
+    const req = idx.getAll(month);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = e => reject(e);
+  });
+}
+
+function addEvent(evt) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.add(evt);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = e => reject(e);
+  });
+}
+
+function updateEvent(evt) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.put(evt);
+    req.onsuccess = () => resolve();
+    req.onerror = e => reject(e);
+  });
+}
+
+function deleteEvent(id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror = e => reject(e);
+  });
+}
+
+// ==================== AUTO UNCHECK ====================
+async function autoUncheck() {
+  const events = await getAllEvents();
+  const now = new Date();
+  for (const evt of events) {
+    if (evt.checked && evt.checkedDate) {
+      const checked = new Date(evt.checkedDate);
+      const diffMonths = (now.getFullYear() - checked.getFullYear()) * 12 + (now.getMonth() - checked.getMonth());
+      if (diffMonths >= AUTO_UNCHECK_MONTHS) {
+        evt.checked = false;
+        evt.checkedDate = null;
+        await updateEvent(evt);
+      }
+    }
+  }
+}
+
+// ==================== SORTING ====================
+function sortEvents(events) {
+  return events.sort((a, b) => {
+    const pa = PERIOD_ORDER[a.period || ''];
+    const pb = PERIOD_ORDER[b.period || ''];
+    if (pa !== pb) return pa - pb;
+    return a.description.localeCompare(b.description);
+  });
+}
+
+// ==================== RENDER CALENDAR ====================
+async function renderCalendar() {
+  const grid = document.getElementById('monthsGrid');
+  const allEvents = await getAllEvents();
+  const now = new Date().getMonth();
+  
+  grid.innerHTML = '';
+  
+  for (let i = 0; i < 12; i++) {
+    const monthEvents = sortEvents(allEvents.filter(e => e.month === i));
+    const card = document.createElement('div');
+    card.className = 'month-card' + (i === now ? ' current-month' : '');
+    card.onclick = () => openMonth(i);
+    
+    let previewHTML = '';
+    const show = Math.min(monthEvents.length, 4);
+    for (let j = 0; j < show; j++) {
+      const e = monthEvents[j];
+      const tag = e.period ? `<span class="period-tag">(${e.period})</span> ` : '';
+      previewHTML += `<li>${tag}${escapeHTML(truncate(e.description, 28))}</li>`;
+    }
+    if (monthEvents.length > 4) {
+      previewHTML += `<li class="preview-more">+${monthEvents.length - 4} autre(s)...</li>`;
+    }
+    
+    card.innerHTML = `
+      <div class="month-name">${MONTH_ICONS[i]} ${MONTHS[i]}</div>
+      ${monthEvents.length ? `<div class="event-count">${monthEvents.length} tâche(s)</div>` : ''}
+      <ul class="preview-list">${previewHTML || '<li style="color:#bbb;font-style:italic">Aucune tâche</li>'}</ul>
+    `;
+    grid.appendChild(card);
+  }
+}
+
+// ==================== RENDER MONTH VIEW ====================
+async function renderMonthView() {
+  if (currentMonth === null) return;
+  
+  const events = sortEvents(await getEventsByMonth(currentMonth));
+  document.getElementById('monthTitle').innerHTML = `
+  <button class="btn-nav" onclick="navigateMonth(-1)" title="Mois précédent">◀</button>
+  <span>${MONTH_ICONS[currentMonth]} ${MONTHS[currentMonth]}</span>
+  <button class="btn-nav" onclick="navigateMonth(1)" title="Mois suivant">▶</button>`;
+  
+  const list = document.getElementById('eventList');
+  list.innerHTML = '';
+  
+  if (!events.length) {
+    list.innerHTML = '<div class="empty-msg">🌿 Aucune tâche pour ce mois.<br>Ajoutez votre première tâche !</div>';
+    return;
+  }
+  
+  for (const evt of events) {
+    const li = document.createElement('li');
+    li.className = 'event-item' + (evt.checked ? ' checked' : '');
+    li.dataset.id = evt.id;
+
+    const periodTag = evt.period ? `<span class="period-tag">(${evt.period})</span> ` : '';
+
+    if (multiSelectMode) {
+      // En mode multi-select, tout le bloc est cliquable
+      li.classList.toggle('multi-checked', multiSelected.has(evt.id));
+      li.innerHTML = `
+        <span class="multi-indicator">${multiSelected.has(evt.id) ? '☑' : '☐'}</span>
+        <div class="event-text">${periodTag}${escapeHTML(evt.description)}</div>
+      `;
+      li.style.cursor = 'pointer';
+      li.style.userSelect = 'none';
+      li.onclick = () => {
+        const id = evt.id;
+        if (multiSelected.has(id)) {
+          multiSelected.delete(id);
+        } else {
+          multiSelected.add(id);
+        }
+        document.getElementById('multiCount').textContent = `${multiSelected.size} sélectionné(s)`;
+        renderMonthView();
+      };
+    } else {
+      // Mode normal
+      li.innerHTML = `
+        <input type="checkbox" class="todo-check" ${evt.checked ? 'checked' : ''} onchange="toggleCheck(${evt.id}, this.checked)">
+        <div class="event-text">${periodTag}${escapeHTML(evt.description)}</div>
+        <div class="event-actions">
+          <button class="btn-icon" title="Modifier" onclick="editEvent(${evt.id})">✏️</button>
+          <button class="btn-icon" title="Supprimer" onclick="confirmDeleteEvent(${evt.id})">🗑️</button>
+        </div>
+      `;
+    }
+    list.appendChild(li);
+  }
+}
+// ==================== FLECHE NAVIGATION ====================
+function navigateMonth(direction) {
+  currentMonth = (currentMonth + direction + 12) % 12;
+  multiSelectMode = false;
+  multiSelected.clear();
+  updateMultiUI();
+  renderMonthView();
+  window.scrollTo(0, 0);
+}
+
+// ==================== NAVIGATION ====================
+function openMonth(monthIndex) {
+  currentMonth = monthIndex;
+  multiSelectMode = false;
+  multiSelected.clear();
+  updateMultiUI();
+  document.getElementById('calendar-view').classList.add('hidden');
+  document.getElementById('month-view').classList.add('active');
+  renderMonthView();
+}
+
+function backToCalendar() {
+  currentMonth = null;
+  multiSelectMode = false;
+  multiSelected.clear();
+  document.getElementById('calendar-view').classList.remove('hidden');
+  document.getElementById('month-view').classList.remove('active');
+  renderCalendar();
+}
+
+// ==================== EVENT MODAL ====================
+function populateMonthSelect(selectId) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '';
+  for (let i = 0; i < 12; i++) {
+    sel.innerHTML += `<option value="${i}">${MONTH_ICONS[i]} ${MONTHS[i]}</option>`;
+  }
+}
+
+function openAddEvent(presetMonth) {
+  closeMenuPanel();
+  editingEventId = null;
+  document.getElementById('modalTitle').textContent = '➕ Nouvel événement';
+  populateMonthSelect('evtMonth');
+  document.getElementById('evtMonth').value = presetMonth !== undefined ? presetMonth : new Date().getMonth();
+  document.getElementById('evtPeriod').value = '';
+  document.getElementById('evtDesc').value = '';
+  document.getElementById('eventModal').classList.add('active');
+}
+
+function openAddEventForMonth() {
+  openAddEvent(currentMonth);
+}
+
+async function editEvent(id) {
+  const events = await getAllEvents();
+  const evt = events.find(e => e.id === id);
+  if (!evt) return;
+  
+  editingEventId = id;
+  document.getElementById('modalTitle').textContent = '✏️ Modifier l\'événement';
+  populateMonthSelect('evtMonth');
+  document.getElementById('evtMonth').value = evt.month;
+  document.getElementById('evtPeriod').value = evt.period || '';
+  document.getElementById('evtDesc').value = evt.description;
+  document.getElementById('eventModal').classList.add('active');
+}
+
+function closeEventModal() {
+  document.getElementById('eventModal').classList.remove('active');
+  editingEventId = null;
+}
+
+async function saveEvent() {
+  const month = parseInt(document.getElementById('evtMonth').value);
+  const period = document.getElementById('evtPeriod').value;
+  const desc = document.getElementById('evtDesc').value.trim();
+  
+  if (!desc) {
+    toast('⚠️ Veuillez saisir une description');
+    return;
+  }
+  
+  if (editingEventId !== null) {
+    const events = await getAllEvents();
+    const evt = events.find(e => e.id === editingEventId);
+    if (evt) {
+      evt.month = month;
+      evt.period = period;
+      evt.description = desc;
+      await updateEvent(evt);
+      toast('✅ Événement modifié');
+    }
+  } else {
+    await addEvent({
+      month,
+      period,
+      description: desc,
+      checked: false,
+      checkedDate: null
+    });
+    toast('✅ Événement ajouté');
+  }
+  
+  closeEventModal();
+  if (currentMonth !== null) {
+    // Si on a changé le mois et qu'on est en vue mois, actualiser
+    currentMonth = month;
+    renderMonthView();
+  } else {
+    renderCalendar();
+  }
+}
+
+// ==================== CHECK / UNCHECK ====================
+async function toggleCheck(id, checked) {
+  const events = await getAllEvents();
+  const evt = events.find(e => e.id === id);
+  if (!evt) return;
+  evt.checked = checked;
+  evt.checkedDate = checked ? new Date().toISOString() : null;
+  await updateEvent(evt);
+  renderMonthView();
+}
+
+// ==================== DELETE ====================
+function confirmDeleteEvent(id) {
+  document.getElementById('confirmTitle').textContent = '🗑️ Supprimer';
+  document.getElementById('confirmText').textContent = 'Voulez-vous vraiment supprimer cet événement ?';
+  document.getElementById('btnConfirm').onclick = async () => {
+    await deleteEvent(id);
+    closeConfirm();
+    toast('🗑️ Événement supprimé');
+    renderMonthView();
+  };
+  document.getElementById('confirmModal').classList.add('active');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('active');
+}
+
+// ==================== MULTI SELECT ====================
+function toggleMultiSelect() {
+  multiSelectMode = !multiSelectMode;
+  multiSelected.clear();
+  updateMultiUI();
+  renderMonthView();
+}
+
+function updateMultiUI() {
+  const list = document.getElementById('eventList');
+  const bar = document.getElementById('multiBar');
+  const btn = document.getElementById('btnMultiToggle');
+  
+  if (multiSelectMode) {
+    list.classList.add('multi-select-mode');
+    bar.classList.add('active');
+    btn.textContent = '✖ Annuler sélection';
+  } else {
+    list.classList.remove('multi-select-mode');
+    bar.classList.remove('active');
+    btn.textContent = '☑ Sélection multiple';
+  }
+  document.getElementById('multiCount').textContent = `${multiSelected.size} sélectionné(s)`;
+}
+
+function toggleMultiItem(id, checked) {
+  if (checked) multiSelected.add(id);
+  else multiSelected.delete(id);
+  document.getElementById('multiCount').textContent = `${multiSelected.size} sélectionné(s)`;
+}
+
+function multiDelete() {
+  if (!multiSelected.size) { toast('⚠️ Aucun élément sélectionné'); return; }
+  document.getElementById('confirmTitle').textContent = '🗑️ Suppression multiple';
+  document.getElementById('confirmText').textContent = `Supprimer ${multiSelected.size} événement(s) ?`;
+  document.getElementById('btnConfirm').onclick = async () => {
+    for (const id of multiSelected) await deleteEvent(id);
+    closeConfirm();
+    multiSelected.clear();
+    toggleMultiSelect();
+    toast('🗑️ Événements supprimés');
+    renderMonthView();
+  };
+  document.getElementById('confirmModal').classList.add('active');
+}
+
+function multiMove() {
+  if (!multiSelected.size) { toast('⚠️ Aucun élément sélectionné'); return; }
+  populateMonthSelect('moveTarget');
+  document.getElementById('moveTarget').value = currentMonth;
+  document.getElementById('moveModal').classList.add('active');
+}
+
+function closeMoveModal() {
+  document.getElementById('moveModal').classList.remove('active');
+}
+
+async function confirmMove() {
+  const target = parseInt(document.getElementById('moveTarget').value);
+  const events = await getAllEvents();
+  for (const id of multiSelected) {
+    const evt = events.find(e => e.id === id);
+    if (evt) {
+      evt.month = target;
+      await updateEvent(evt);
+    }
+  }
+  closeMoveModal();
+  multiSelected.clear();
+  toggleMultiSelect();
+  toast(`📦 Déplacé vers ${MONTHS[target]}`);
+  currentMonth = target;
+  document.getElementById('monthTitle').innerHTML = `
+  <button class="btn-nav" onclick="navigateMonth(-1)" title="Mois précédent">◀</button>
+  <span>${MONTH_ICONS[currentMonth]} ${MONTHS[currentMonth]}</span>
+  <button class="btn-nav" onclick="navigateMonth(1)" title="Mois suivant">▶</button>`;
+  renderMonthView();
+}
+
+// ==================== MENU ====================
+function openMenuPanel() {
+  document.getElementById('sideMenu').classList.add('active');
+  document.getElementById('menuOverlay').classList.add('active');
+}
+
+function closeMenuPanel() {
+  document.getElementById('sideMenu').classList.remove('active');
+  document.getElementById('menuOverlay').classList.remove('active');
+}
+
+// ==============================
+// CRUD SEMIS
+// ==============================
+
+async function addSemis(semis) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semis', 'readwrite');
+        const req = tx.objectStore('semis').add(semis);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function getSemis(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semis', 'readonly');
+        const req = tx.objectStore('semis').get(id);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function getAllSemis() {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semis', 'readonly');
+        const req = tx.objectStore('semis').getAll();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function updateSemis(semis) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semis', 'readwrite');
+        const req = tx.objectStore('semis').put(semis);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function deleteSemis(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semis', 'readwrite');
+        const req = tx.objectStore('semis').delete(id);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+
+// ==============================
+// CRUD HISTORIQUE SEMIS
+// ==============================
+
+async function addSemisHistorique(entry) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semisHistorique', 'readwrite');
+        const req = tx.objectStore('semisHistorique').add(entry);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function updateSemisHistorique(entry) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semisHistorique', 'readwrite');
+        const req = tx.objectStore('semisHistorique').put(entry);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function getSemisHistorique(semisId) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semisHistorique', 'readonly');
+        const store = tx.objectStore('semisHistorique');
+        const index = store.index('semisId');
+        const req = index.getAll(semisId);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function getAllSemisHistorique() {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semisHistorique', 'readonly');
+        const req = tx.objectStore('semisHistorique').getAll();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function deleteAllSemisHistorique(semisId) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('semisHistorique', 'readwrite');
+        const store = tx.objectStore('semisHistorique');
+        const index = store.index('semisId');
+        const req = index.openCursor(semisId);
+        req.onsuccess = (e) => {
+            const cursor = e.target.result;
+            if (cursor) {
+                cursor.delete();
+                cursor.continue();
+            }
+        };
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
+// ==============================
+// CONSEILS & ASTUCES
+// ==============================
+
+const TAGS_CONSEILS = {
+  'potager-semis': '🥕 Potager & Semis',
+  'arbres-fleurs': '🌳 Arbres & Fleurs',
+  'entretien-sol': '🧹 Entretien & Sol',
+  'maladies-protection': '🛡️ Maladies & Protection',
+  'calendrier-materiel': '📅 Calendrier & Matériel'
+};
+
+let currentConseilId = null;
+let currentMode = 'calendar'; // 'calendar' | 'semis' | 'conseils'
+
+// ===== Fonctions DB Conseils =====
+
+function addConseil(data) {
+  return new Promise((resolve, reject) => {
+    openDB().then(db => {
+      const tx = db.transaction('conseils', 'readwrite');
+      const req = tx.objectStore('conseils').add(data);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  });
+}
+
+function getAllConseils() {
+  return new Promise((resolve, reject) => {
+    openDB().then(db => {
+      const tx = db.transaction('conseils', 'readonly');
+      const req = tx.objectStore('conseils').getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  });
+}
+
+function getConseilById(id) {
+  return new Promise((resolve, reject) => {
+    openDB().then(db => {
+      const tx = db.transaction('conseils', 'readonly');
+      const req = tx.objectStore('conseils').get(id);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  });
+}
+
+function updateConseil(data) {
+  return new Promise((resolve, reject) => {
+    openDB().then(db => {
+      const tx = db.transaction('conseils', 'readwrite');
+      const req = tx.objectStore('conseils').put(data);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  });
+}
+
+function deleteConseil(id) {
+  return new Promise((resolve, reject) => {
+    openDB().then(db => {
+      const tx = db.transaction('conseils', 'readwrite');
+      const req = tx.objectStore('conseils').delete(id);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  });
+}
+
+// ===== Navigation des modes =====
+function cycleMode() {
+    if (currentMode === 'calendar') {
+        showSemisSection();
+    } else if (currentMode === 'semis') {
+        showConseilsSection();
+    } else {
+        showCalendarSection();
+    }
+    closeMenuPanel();
+}
+
+function showCalendarSection() {
+  currentMode = 'calendar';
+  document.getElementById('calendar-view').classList.remove('hidden');
+  document.getElementById('month-view').classList.remove('hidden');
+  document.getElementById('month-view').classList.remove('active');
+  document.getElementById('semis-section').classList.add('hidden');
+  document.getElementById('conseils-section').classList.add('hidden');
+  document.getElementById('btnModeToggle').textContent = '🌱 Mes Semis';
+  document.getElementById('btnModeToggle').setAttribute('data-next', 'semis');
+  document.getElementById('app-title').textContent = '📅 Mon Calendrier Potager';
+  currentMonth = null;
+  renderCalendar();
+}
+
+function showSemisSection() {
+  currentMode = 'semis';
+  document.getElementById('calendar-view').classList.add('hidden');
+  document.getElementById('month-view').classList.add('hidden');
+  document.getElementById('semis-section').classList.remove('hidden');
+  document.getElementById('conseils-section').classList.add('hidden');
+  document.getElementById('btnModeToggle').textContent = '💡 Mes Conseils & Astuces';
+  document.getElementById('btnModeToggle').setAttribute('data-next', 'conseils');
+  showSemisView('semis-list-view');
+  loadSemisList();
+}
+
+function showConseilsSection() {
+  currentMode = 'conseils';
+  document.getElementById('calendar-view').classList.add('hidden');
+  document.getElementById('month-view').classList.add('hidden');
+  document.getElementById('semis-section').classList.add('hidden');
+  document.getElementById('conseils-section').classList.remove('hidden');
+  document.getElementById('btnModeToggle').textContent = '📅 Mon Calendrier Potager';
+  document.getElementById('btnModeToggle').setAttribute('data-next', 'calendrier');
+  loadConseilsList();
+}
+
+// ===== Tags =====
+
+function genererTagsBadges(tags) {
+  if (!tags || tags.length === 0) return '';
+  return '<div class="conseil-tags">' +
+    tags.map(t => `<span class="conseil-tag-badge" data-tag="${t}">${TAGS_CONSEILS[t] || t}</span>`).join('') +
+    '</div>';
+}
+
+function getTagsFiltresActifs() {
+  const actifs = [];
+  document.querySelectorAll('.filtre-tag-cb:checked').forEach(cb => {
+    actifs.push(cb.value);
+  });
+  return actifs;
+}
+
+// ===== Affichage grille =====
+
+async function loadConseilsList() {
+  const conseils = await getAllConseils();
+  const container = document.getElementById('conseilsGrid');
+  const filtresActifs = getTagsFiltresActifs();
+
+  if (!conseils || conseils.length === 0) {
+    container.innerHTML = '<p class="empty-message">Aucun conseil ajouté pour le moment.<br>Appuyez sur ＋ pour en créer un !</p>';
+    return;
+  }
+
+  let conseilsFiltres = conseils;
+  if (filtresActifs.length > 0) {
+    conseilsFiltres = conseils.filter(c => {
+      if (!c.tags || c.tags.length === 0) return false;
+      return filtresActifs.every(f => c.tags.includes(f));
+    });
+  }
+
+  if (conseilsFiltres.length === 0) {
+    container.innerHTML = '<p class="empty-message">Aucun conseil ne correspond aux filtres sélectionnés</p>';
+    return;
+  }
+
+  // Trier par date de création (plus récent d'abord)
+  conseilsFiltres.sort((a, b) => (b.dateCreation || '').localeCompare(a.dateCreation || ''));
+
+  container.innerHTML = conseilsFiltres.map(c => `
+    <div class="conseil-card" onclick="openConseilDetail(${c.id})">
+      <div class="conseil-card-titre">${escapeHTML(c.titre)}</div>
+      ${genererTagsBadges(c.tags)}
+      <div class="conseil-card-extrait">${escapeHTML(c.texte)}</div>
+    </div>
+  `).join('');
+}
+
+// ===== Vues internes conseils =====
+function showConseilView(viewName) {
+  // S'assurer qu'on est sur la section conseils
+  document.getElementById('calendar-view').classList.add('hidden');
+  document.getElementById('month-view').classList.add('hidden');
+  document.getElementById('semis-section').classList.add('hidden');
+  const conseilsSection = document.getElementById('conseils-section');
+  conseilsSection.classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.nav-btn[data-section="conseils"]')?.classList.add('active');
+
+  // Cacher toutes les vues
+  document.querySelectorAll('#conseils-section .conseil-view').forEach(v => {
+    v.classList.add('hidden');
+  });
+
+  const grid = document.getElementById('conseilsGrid');
+  const filtres = document.querySelector('.conseils-filtres-bar');
+  const toolbar = document.querySelector('.conseils-toolbar');
+
+  if (viewName === 'liste') {
+    if (grid) grid.classList.remove('hidden');
+    if (filtres) filtres.classList.remove('hidden');
+    if (toolbar) toolbar.classList.remove('hidden');
+    loadConseilsList();
+  } else {
+    if (grid) grid.classList.add('hidden');
+    if (filtres) filtres.classList.add('hidden');
+    if (toolbar) toolbar.classList.add('hidden');
+    document.getElementById('conseil-' + viewName + '-view').classList.remove('hidden');
+  }
+}
+
+function backToConseilsList() {
+  showConseilView('liste');
+}
+
+// ===== Détail =====
+
+async function openConseilDetail(id) {
+  const c = await getConseilById(id);
+  if (!c) {
+    showToast('Conseil introuvable');
+    return;
+  }
+
+  currentConseilId = id;
+
+  document.getElementById('detail-conseil-titre').textContent = c.titre;
+  document.getElementById('detail-conseil-tags').innerHTML = genererTagsBadges(c.tags);
+  document.getElementById('detail-conseil-texte').textContent = c.texte;
+
+  const lienEl = document.getElementById('detail-conseil-lien');
+  if (c.lien) {
+    lienEl.innerHTML = `<a href="${escapeHTML(c.lien)}" target="_blank" rel="noopener">🔗 Voir le lien</a>`;
+  } else {
+    lienEl.innerHTML = '';
+  }
+
+  const sourceEl = document.getElementById('detail-conseil-source');
+  sourceEl.textContent = c.source ? `Source : ${c.source}` : '';
+
+  const dateEl = document.getElementById('detail-conseil-date');
+  dateEl.textContent = c.dateCreation ? `Ajouté le ${c.dateCreation}` : '';
+
+  showConseilView('detail');
+}
+
+// ===== Création =====
+
+function openCreationConseil() {
+  document.getElementById('form-creation-conseil').reset();
+  document.querySelectorAll('.creation-tag-cb').forEach(cb => cb.checked = false);
+  showConseilView('creation');
+}
+
+async function handleCreationConseil(e) {
+  e.preventDefault();
+
+  const titre = document.getElementById('conseil-titre').value.trim();
+  const texte = document.getElementById('conseil-texte').value.trim();
+
+  if (!titre || !texte) {
+    showToast('Remplissez le titre et le contenu');
+    return;
+  }
+
+  const tags = [];
+  document.querySelectorAll('.creation-tag-cb:checked').forEach(cb => tags.push(cb.value));
+
+  if (tags.length === 0) {
+    showToast('Sélectionnez au moins une catégorie');
+    return;
+  }
+
+  const conseilData = {
+    titre,
+    texte,
+    lien: document.getElementById('conseil-lien').value.trim() || '',
+    source: document.getElementById('conseil-source').value.trim() || '',
+    tags,
+    dateCreation: new Date().toISOString().split('T')[0]
+  };
+
+  await addConseil(conseilData);
+  showToast('Conseil ajouté ✓');
+  showConseilView('liste');
+}
+
+// ===== Édition =====
+
+async function openEditionConseil(id) {
+  const conseil = await getConseilById(id);
+  if (!conseil) {
+    showToast('Conseil introuvable');
+    return;
+  }
+
+  document.getElementById('edit-conseil-id').value = conseil.id;
+  document.getElementById('edit-conseil-titre').value = conseil.titre;
+  document.getElementById('edit-conseil-texte').value = conseil.texte;
+  document.getElementById('edit-conseil-lien').value = conseil.lien || '';
+  document.getElementById('edit-conseil-source').value = conseil.source || '';
+
+  document.querySelectorAll('.edition-tag-cb').forEach(cb => {
+    cb.checked = conseil.tags && conseil.tags.includes(cb.value);
+  });
+
+  showConseilView('edition');
+}
+
+async function handleEditionConseil(e) {
+  e.preventDefault();
+
+  const id = Number(document.getElementById('edit-conseil-id').value);
+  const titre = document.getElementById('edit-conseil-titre').value.trim();
+  const texte = document.getElementById('edit-conseil-texte').value.trim();
+
+  if (!titre || !texte) {
+    showToast('Remplissez le titre et le contenu');
+    return;
+  }
+
+  const tags = [];
+  document.querySelectorAll('.edition-tag-cb:checked').forEach(cb => tags.push(cb.value));
+
+  if (tags.length === 0) {
+    showToast('Sélectionnez au moins une catégorie');
+    return;
+  }
+
+  const existant = await getConseilById(id);
+
+  const conseilData = {
+    id,
+    titre,
+    texte,
+    lien: document.getElementById('edit-conseil-lien').value.trim() || '',
+    source: document.getElementById('edit-conseil-source').value.trim() || '',
+    tags,
+    dateCreation: existant ? existant.dateCreation : new Date().toISOString().split('T')[0]
+  };
+
+  await updateConseil(conseilData);
+  showToast('Conseil modifié ✓');
+  showConseilView('liste');
+}
+
+// ===== Suppression =====
+
+async function deleteConseilConfirm(id) {
+  if (!confirm('Supprimer ce conseil ?')) return;
+  await deleteConseil(id);
+  showToast('Conseil supprimé ✓');
+  showConseilView('liste');
+}
+
+// ==============================
+// SEMIS.JS - Gestion des bacs de semis
+// ==============================
+
+let currentSemisId = null;
+let initialSemisValues = {};
+
+const ETATS_CYCLE = ['attente', 'leve', 'repique', 'replante', 'deplace', 'mort'];
+const ETATS_LABELS = {
+    attente: 'Attente',
+    leve: 'Levé',
+    repique: 'Repiqué',
+    replante: 'Replanté',
+    deplace: 'Déplacé',
+    mort: 'Mort'
+};
+
+// ==============================
+// INITIALISATION
+// ==============================
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('form-creation-semis').addEventListener('submit', handleCreationSemis);
+    document.getElementById('form-modifier-semis').addEventListener('submit', handleModifierSemis);
+});
+
+// ==============================
+// NAVIGATION SEMIS
+// ==============================
+
+function showSemisView(viewId) {
+    document.querySelectorAll('.semis-view').forEach(v => v.classList.add('hidden'));
+    document.getElementById(viewId).classList.remove('hidden');
+}
+
+function retourListeSemis() {
+    showSemisView('semis-list-view');
+    loadSemisList();
+}
+
+// ==============================
+// UTILITAIRES
+// ==============================
+
+function getCellNumero(r, c, colonnes, lignes) {
+    return c * lignes + r + 1;
+}
+
+function todayISOSemis() {
+    return new Date().toISOString().split('T')[0];
+}
+
+function formatDateSemis(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function getNextEtat(etat) {
+    const idx = ETATS_CYCLE.indexOf(etat);
+    return ETATS_CYCLE[(idx + 1) % ETATS_CYCLE.length];
+}
+
+function getEtatClass(etat) {
+    return 'etat-' + etat;
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ==============================
+// LISTE DES BACS
+// ==============================
+
+async function loadSemisList() {
+    const list = await getAllSemis();
+    const tri = document.getElementById('semis-tri-select').value;
+
+    list.sort((a, b) => {
+        if (tri === 'lieu') {
+            return (a.lieu || '').localeCompare(b.lieu || '') || a.nom.localeCompare(b.nom);
+        }
+        return a.nom.localeCompare(b.nom);
+    });
+
+    const container = document.getElementById('semis-list');
+
+    if (list.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--text-secondary,#888);padding:40px 0;">Aucun bac de semis.<br>Créez votre premier bac ! 🌱</p>';
+        return;
+    }
+
+    // Récupérer tout l'historique une seule fois
+    const allHistorique = await getAllSemisHistorique();
+
+    container.innerHTML = list.map(s => {
+        // Compter les états
+        const stats = {};
+        ETATS_CYCLE.forEach(e => stats[e] = 0);
+        if (s.grille) {
+            for (const row of s.grille) {
+                for (const cell of row) {
+                    stats[cell.etat] = (stats[cell.etat] || 0) + 1;
+                }
+            }
+        }
+
+        const statsHtml = ETATS_CYCLE
+            .filter(e => stats[e] > 0)
+            .map(e => `<span class="semis-card-stat ${getEtatClass(e)}">${stats[e]} ${ETATS_LABELS[e].toLowerCase()}</span>`)
+            .join('');
+
+        // Dernier contrôle (dernière entrée d'historique pour ce bac)
+        const bacHistorique = allHistorique
+            .filter(h => h.semisId === s.id)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+        const dernierControle = bacHistorique.length > 0
+            ? `<div class="semis-card-controle">🔎 ${formatDateSemis(bacHistorique[0].date)}</div>`
+            : `<div class="semis-card-controle">🔎 Aucun contrôle</div>`;
+
+        return `
+            <div class="semis-card" onclick="openSemisDetail(${s.id})">
+                <div class="semis-card-header">
+                    <span class="semis-card-nom">${s.nom}</span>
+                    <span class="semis-card-dimensions">${s.lignes}×${s.colonnes}</span>
+                </div>
+                ${s.lieu ? `<div class="semis-card-lieu">${s.lieu}</div>` : ''}
+                <div class="semis-card-stats">${statsHtml || '<span style="color:var(--text-secondary,#888)">Aucun godet</span>'}</div>
+                ${dernierControle}
+            </div>
+        `;
+    }).join('');
+}
+
+// ==============================
+// CREATION D'UN BAC
+// ==============================
+function openCreationSemis() {
+    document.getElementById('form-creation-semis').reset();
+    document.getElementById('creation-grille-section').classList.add('hidden');
+    document.getElementById('creation-noms-section').classList.add('hidden');
+    showSemisSection();
+    showSemisView('semis-creation-view');
+}
+
+function previewGrilleCreation() {
+    const lignes = parseInt(document.getElementById('creation-semis-lignes').value) || 1;
+    const colonnes = parseInt(document.getElementById('creation-semis-colonnes').value) || 1;
+
+    // Grille preview
+    const container = document.getElementById('creation-grille-preview');
+    container.innerHTML = '';
+    container.style.gridTemplateColumns = `repeat(${colonnes}, 70px)`;
+    container.classList.add('grille-table');
+
+    for (let r = 0; r < lignes; r++) {
+        for (let c = 0; c < colonnes; c++) {
+            const num = getCellNumero(r, c, colonnes, lignes);
+            const div = document.createElement('div');
+            div.className = 'grille-cell etat-attente';
+            div.innerHTML = `
+                <span class="grille-cell-numero">${num}</span>
+                <span class="grille-cell-nom" lang="fr"></span>
+            `;
+            container.appendChild(div);
+        }
+    }
+
+    // Noms
+    const nomsContainer = document.getElementById('creation-semis-noms');
+    nomsContainer.innerHTML = '';
+    const totalCells = lignes * colonnes;
+    for (let num = 1; num <= totalCells; num++) {
+        const c = Math.floor((num - 1) / lignes);
+        const r = (num - 1) % lignes;
+        const div = document.createElement('div');
+        div.className = 'grid-name-row';
+        div.innerHTML = `
+            <span class="cell-label">${num} —</span>
+            <input type="text" data-row="${r}" data-col="${c}" value="" placeholder="Nom (facultatif)">
+        `;
+        nomsContainer.appendChild(div);
+    }
+
+    document.getElementById('creation-grille-section').classList.remove('hidden');
+    document.getElementById('creation-noms-section').classList.remove('hidden');
+}
+
+async function handleCreationSemis(e) {
+    e.preventDefault();
+
+    const nom = document.getElementById('creation-semis-nom').value.trim();
+    const lieu = document.getElementById('creation-semis-lieu').value.trim();
+    const lignes = parseInt(document.getElementById('creation-semis-lignes').value) || 1;
+    const colonnes = parseInt(document.getElementById('creation-semis-colonnes').value) || 1;
+
+    if (!nom) return;
+
+    // Construire la grille
+    const grille = [];
+    for (let r = 0; r < lignes; r++) {
+        const row = [];
+        for (let c = 0; c < colonnes; c++) {
+            const input = document.querySelector(`#creation-semis-noms input[data-row="${r}"][data-col="${c}"]`);
+            const cellNom = input ? input.value.trim() : '';
+            row.push({ nom: cellNom, etat: 'attente' });
+        }
+        grille.push(row);
+    }
+
+    const semis = {
+        nom,
+        lieu,
+        lignes,
+        colonnes,
+        grille,
+        dernierArrosage: null,
+        dateCreation: todayISOSemis()
+    };
+
+    const id = await addSemis(semis);
+    showToast('Bac créé ✓');
+    openSemisDetail(id);
+}
+
+// ==============================
+// DETAIL D'UN BAC
+// ==============================
+
+async function openSemisDetail(id) {
+    const semis = await getSemis(id);
+    if (!semis) {
+        showToast('Bac introuvable');
+        return;
+    }
+
+    currentSemisId = id;
+    showSemisView('semis-detail-view');
+
+    // En-tête
+    document.getElementById('detail-semis-titre').textContent = semis.nom;
+    document.getElementById('detail-semis-lieu').textContent = semis.lieu || 'Lieu non renseigné';
+
+    // Grille
+    renderGrilleDetail(semis);
+
+    // Arrosage
+    await renderArrosageDetail(semis);
+
+    // Historique
+    await renderHistoriqueDetail(semis);
+
+    // Sauvegarder les valeurs initiales
+    saveSemisInitialValues(semis);
+}
+
+function renderGrilleDetail(semis) {
+    const container = document.getElementById('detail-semis-grille');
+    container.innerHTML = '';
+    container.style.gridTemplateColumns = `repeat(${semis.colonnes}, 70px)`;
+    container.classList.add('grille-table');
+
+    for (let r = 0; r < semis.lignes; r++) {
+        for (let c = 0; c < semis.colonnes; c++) {
+            const cell = semis.grille[r][c];
+            const num = getCellNumero(r, c, semis.colonnes, semis.lignes);
+            const div = document.createElement('div');
+            div.className = `grille-cell ${getEtatClass(cell.etat)}`;
+            div.dataset.row = r;
+            div.dataset.col = c;
+            div.title = `${cell.nom || 'Case ' + num} (${ETATS_LABELS[cell.etat]}) — Cliquer pour changer`;
+
+            div.innerHTML = `
+                <span class="grille-cell-numero">${num}</span>
+                <span class="grille-cell-nom" lang="fr">${cell.nom || ''}</span>
+            `;
+
+            div.addEventListener('click', () => {
+                const currentEtat = div.dataset.etat || cell.etat;
+                const nextEtat = getNextEtat(currentEtat);
+                div.dataset.etat = nextEtat;
+
+                // Retirer les anciennes classes d'état
+                ETATS_CYCLE.forEach(e => div.classList.remove(getEtatClass(e)));
+                div.classList.add(getEtatClass(nextEtat));
+                div.title = `${cell.nom || 'Case ' + num} (${ETATS_LABELS[nextEtat]}) — Cliquer pour changer`;
+            });
+
+            container.appendChild(div);
+        }
+    }
+}
+
+async function renderArrosageDetail(semis) {
+    const historique = await getSemisHistorique(semis.id);
+    const arrosages = historique.filter(h => h.arrosage).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    let dernierText = '<strong>Dernier arrosage :</strong> Aucun';
+    let prochainText = '';
+
+    if (arrosages.length > 0) {
+        dernierText = `<strong>Dernier arrosage :</strong> ${formatDateSemis(arrosages[0].date)}`;
+
+        if (arrosages.length >= 3) {
+            // Calcul par médiane des intervalles
+            const intervalles = [];
+            for (let i = 0; i < arrosages.length - 1; i++) {
+                const d1 = new Date(arrosages[i].date);
+                const d2 = new Date(arrosages[i + 1].date);
+                const jours = Math.round((d1 - d2) / (1000 * 60 * 60 * 24));
+                if (jours > 0) intervalles.push(jours);
+            }
+
+            if (intervalles.length > 0) {
+                // Médiane
+                intervalles.sort((a, b) => a - b);
+                const mid = Math.floor(intervalles.length / 2);
+                const mediane = intervalles.length % 2 === 0
+                    ? Math.round((intervalles[mid - 1] + intervalles[mid]) / 2)
+                    : intervalles[mid];
+
+                const prochainDate = new Date(arrosages[0].date);
+                prochainDate.setDate(prochainDate.getDate() + mediane);
+                prochainText = `<strong>Prochain arrosage estimé :</strong> <span class="highlight">${formatDateSemis(prochainDate.toISOString())} (≈ tous les ${mediane} jours)</span>`;
+            } else {
+                prochainText = '<strong>Prochain arrosage estimé :</strong> Pas assez de données';
+            }
+        } else {
+            prochainText = '<strong>Prochain arrosage estimé :</strong> Pas assez de données (min. 3 arrosages)';
+        }
+    }
+
+    document.getElementById('detail-semis-dernier-arrosage').innerHTML = dernierText;
+    document.getElementById('detail-semis-prochain-arrosage').innerHTML = prochainText;
+}
+
+async function renderHistoriqueDetail(semis) {
+    const historique = await getSemisHistorique(semis.id);
+    historique.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const container = document.getElementById('detail-semis-historique');
+
+    if (historique.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-secondary,#888);text-align:center;">Aucun historique</p>';
+        return;
+    }
+
+    container.innerHTML = historique.map(h => {
+        const details = [];
+        if (h.arrosage) details.push('💧 Arrosage');
+        if (h.grilleSnapshot) {
+            // Compter les changements
+            const stats = {};
+            ETATS_CYCLE.forEach(e => stats[e] = 0);
+            for (const row of h.grilleSnapshot) {
+                for (const cell of row) {
+                    stats[cell.etat] = (stats[cell.etat] || 0) + 1;
+                }
+            }
+            const changes = ETATS_CYCLE
+                .filter(e => stats[e] > 0)
+                .map(e => `${stats[e]} ${ETATS_LABELS[e].toLowerCase()}`)
+                .join(', ');
+            details.push(`🌱 Grille : ${changes}`);
+        }
+
+        return `
+            <div class="historique-entry">
+                <div class="historique-entry-date">${formatDateSemis(h.date)}</div>
+                <div class="historique-entry-details">${details.join(' · ') || 'Modification'}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ==============================
+// ARROSAGE
+// ==============================
+
+let arrosageMarque = false;
+
+async function handleArroserSemis() {
+    arrosageMarque = !arrosageMarque;
+    const btn = document.getElementById('btn-arroser-semis');
+    if (arrosageMarque) {
+        btn.textContent = '💧 Arrosage marqué ✓';
+        btn.style.opacity = '0.7';
+    } else {
+        btn.textContent = '💧 Arrosé aujourd\'hui';
+        btn.style.opacity = '1';
+    }
+}
+
+// ==============================
+// GRILLE ← DOM
+// ==============================
+
+function getGrilleFromDOM(semis) {
+    const grille = JSON.parse(JSON.stringify(semis.grille));
+    const cells = document.querySelectorAll('#detail-semis-grille .grille-cell');
+
+    cells.forEach(div => {
+        const r = parseInt(div.dataset.row);
+        const c = parseInt(div.dataset.col);
+        if (div.dataset.etat) {
+            grille[r][c].etat = div.dataset.etat;
+        }
+    });
+
+    return grille;
+}
+
+// ==============================
+// ENREGISTRER ENTRETIEN
+// ==============================
+
+function saveSemisInitialValues(semis) {
+    initialSemisValues = {
+        grille: JSON.stringify(semis.grille),
+        arrosage: false
+    };
+    arrosageMarque = false;
+    const btn = document.getElementById('btn-arroser-semis');
+    btn.textContent = '💧 Arrosé aujourd\'hui';
+    btn.style.opacity = '1';
+}
+
+function hasSemisModifications(semis) {
+    if (arrosageMarque) return true;
+    if (JSON.stringify(getGrilleFromDOM(semis)) !== initialSemisValues.grille) return true;
+    return false;
+}
+
+async function handleEnregistrerEntretienSemis() {
+    const semis = await getSemis(currentSemisId);
+    if (!semis) return;
+
+    semis.grille = getGrilleFromDOM(semis);
+
+    if (!hasSemisModifications(semis)) {
+        showToast('Aucune modification à enregistrer');
+        return;
+    }
+
+    const today = todayISOSemis();
+    let histEntry = { semisId: currentSemisId, date: today };
+    let hasEntryData = false;
+    let isUpdate = false;
+
+    const historiques = await getSemisHistorique(currentSemisId);
+    const existante = historiques.find(h => h.date === today);
+    if (existante) {
+        histEntry = existante;
+        isUpdate = true;
+    }
+
+    // Arrosage
+    if (arrosageMarque) {
+        histEntry.arrosage = true;
+        semis.dernierArrosage = today;
+        hasEntryData = true;
+    }
+
+    // Grille
+    if (JSON.stringify(semis.grille) !== initialSemisValues.grille) {
+        histEntry.grilleSnapshot = JSON.parse(JSON.stringify(semis.grille));
+        hasEntryData = true;
+    }
+
+    if (hasEntryData) {
+        await updateSemis(semis);
+        if (isUpdate) {
+            await updateSemisHistorique(histEntry);
+        } else {
+            await addSemisHistorique(histEntry);
+        }
+        showToast('Entretien enregistré ✓');
+        openSemisDetail(currentSemisId);
+    }
+}
+
+// ==============================
+// MODIFICATION D'UN BAC
+// ==============================
+
+async function handleOpenModifierSemis() {
+    const semis = await getSemis(currentSemisId);
+    if (!semis) return;
+
+    showSemisView('semis-modifier-view');
+
+    document.getElementById('modifier-semis-id').value = semis.id;
+    document.getElementById('modifier-semis-nom').value = semis.nom;
+    document.getElementById('modifier-semis-lieu').value = semis.lieu || '';
+    document.getElementById('modifier-semis-lignes').value = semis.lignes;
+    document.getElementById('modifier-semis-colonnes').value = semis.colonnes;
+
+    // Afficher noms des cases
+        const container = document.getElementById('modifier-semis-noms');
+    container.innerHTML = '';
+    const totalCells = semis.lignes * semis.colonnes;
+    for (let num = 1; num <= totalCells; num++) {
+        const c = Math.floor((num - 1) / semis.lignes);
+        const r = (num - 1) % semis.lignes;
+        const cell = semis.grille[r] && semis.grille[r][c] ? semis.grille[r][c] : { nom: '' };
+        const div = document.createElement('div');
+        div.className = 'grid-name-row';
+        div.innerHTML = `
+            <span class="cell-label">${num} —</span>
+            <input type="text" data-row="${r}" data-col="${c}" value="${cell.nom || ''}" placeholder="Nom (facultatif)">
+        `;
+        container.appendChild(div);
+    }
+
+    document.getElementById('modifier-grille-section').classList.remove('hidden');
+    document.getElementById('modifier-noms-section').classList.remove('hidden');
+
+    // Preview grille
+    previewGrilleModification();
+}
+
+function previewGrilleModification() {
+    const lignes = parseInt(document.getElementById('modifier-semis-lignes').value) || 1;
+    const colonnes = parseInt(document.getElementById('modifier-semis-colonnes').value) || 1;
+
+    const container = document.getElementById('modifier-grille-preview');
+    container.innerHTML = '';
+    container.style.gridTemplateColumns = `repeat(${colonnes}, 70px)`;
+    container.classList.add('grille-table');
+
+    for (let r = 0; r < lignes; r++) {
+        for (let c = 0; c < colonnes; c++) {
+            const num = getCellNumero(r, c, colonnes, lignes);
+            const div = document.createElement('div');
+            div.className = 'grille-cell etat-attente';
+            div.innerHTML = `
+                <span class="grille-cell-numero">${num}</span>
+                <span class="grille-cell-nom" lang="fr"></span>
+            `;
+            container.appendChild(div);
+        }
+    }
+}
+
+async function handleModifierSemis(e) {
+    e.preventDefault();
+
+    const semis = await getSemis(currentSemisId);
+    if (!semis) return;
+
+    const nom = document.getElementById('modifier-semis-nom').value.trim();
+    if (!nom) return;
+
+    const newLignes = parseInt(document.getElementById('modifier-semis-lignes').value) || semis.lignes;
+    const newColonnes = parseInt(document.getElementById('modifier-semis-colonnes').value) || semis.colonnes;
+
+    // Recréer la grille si dimensions changées
+    if (newLignes !== semis.lignes || newColonnes !== semis.colonnes) {
+        const newGrille = [];
+        for (let r = 0; r < newLignes; r++) {
+            const row = [];
+            for (let c = 0; c < newColonnes; c++) {
+                if (r < semis.lignes && c < semis.colonnes) {
+                    row.push(semis.grille[r][c]);
+                } else {
+                    row.push({ nom: '', etat: 'attente' });
+                }
+            }
+            newGrille.push(row);
+        }
+        semis.grille = newGrille;
+        semis.lignes = newLignes;
+        semis.colonnes = newColonnes;
+    }
+
+    // Mettre à jour les noms des cases
+    document.querySelectorAll('#modifier-semis-noms input').forEach(input => {
+        const r = parseInt(input.dataset.row);
+        const c = parseInt(input.dataset.col);
+        if (r < semis.lignes && c < semis.colonnes) {
+            semis.grille[r][c].nom = input.value.trim();
+        }
+    });
+
+    semis.nom = nom;
+    semis.lieu = document.getElementById('modifier-semis-lieu').value.trim() || '';
+
+    await updateSemis(semis);
+    showToast('Modifications enregistrées ✓');
+    openSemisDetail(currentSemisId);
+}
+
+// ==============================
+// SUPPRESSION D'UN BAC
+// ==============================
+
+async function handleSupprimerSemis() {
+    if (!confirm('Supprimer ce bac de semis et tout son historique ?')) return;
+
+    await deleteSemis(currentSemisId);
+    await deleteAllSemisHistorique(currentSemisId);
+    currentSemisId = null;
+    showToast('Bac supprimé ✓');
+    retourListeSemis();
+}
+
+// ==================== HELPER EXPORT FICHIER ====================
+async function saveAndShareFile(json, fileName) {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+        const { Filesystem } = window.Capacitor.Plugins;
+        
+        await Filesystem.writeFile({
+            path: fileName,
+            data: btoa(unescape(encodeURIComponent(json))),
+            directory: 'CACHE',
+            recursive: true
+        });
+
+        const uriResult = await Filesystem.getUri({
+            path: fileName,
+            directory: 'CACHE'
+        });
+
+        await window.Capacitor.Plugins.Share.share({
+            title: fileName,
+            url: uriResult.uri,
+            dialogTitle: 'Sauvegarder vers...'
+        });
+    } else {
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+}
+
+// ==================== CALENDRIER EXPORT / IMPORT ====================
+async function exportData() {
+    closeMenuPanel();
+    try {
+        const events = await getAllEvents();
+        const json = JSON.stringify(events.map(e => ({
+            month: e.month,
+            period: e.period,
+            description: e.description,
+            checked: e.checked,
+            checkedDate: e.checkedDate
+        })), null, 2);
+
+        const fileName = `POTA_Calendrier-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        await saveAndShareFile(json, fileName);
+        toast('📤 Sauvegarde exportée');
+    } catch (e) {
+        toast('❌ Erreur lors de l\'export');
+        console.error(e);
+    }
+}
+
+function triggerImport() {
+    closeMenuPanel();
+    document.getElementById('importFile').click();
+}
+
+async function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        if (!Array.isArray(data)) throw new Error('Format invalide');
+
+        let count = 0;
+        for (const item of data) {
+            if (typeof item.month === 'number' && item.month >= 0 && item.month <= 11 && item.description) {
+                await addEvent({
+                    month: item.month,
+                    period: item.period || '',
+                    description: item.description,
+                    checked: item.checked || false,
+                    checkedDate: item.checkedDate || null
+                });
+                count++;
+            }
+        }
+
+        toast(`📥 ${count} événement(s) importé(s)`);
+        if (currentMonth !== null) renderMonthView();
+        else renderCalendar();
+    } catch (e) {
+        toast('❌ Erreur lors de l\'import');
+        console.error(e);
+    }
+
+    event.target.value = '';
+}
+
+// ==============================
+// EXPORT / IMPORT SEMIS
+// ==============================
+
+async function exportSemisData() {
+    try {
+        const semis = await getAllSemis();
+        const historique = await getAllSemisHistorique();
+        const data = {
+            type: 'potager-semis-backup',
+            version: 1,
+            date: new Date().toISOString(),
+            semis: semis,
+            historique: historique
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        const fileName = `POTA_Semis-backup-${new Date().toISOString().split('T')[0]}.json`;
+        await saveAndShareFile(json, fileName);
+        showToast('Export semis réussi ✓');
+    } catch (err) {
+        showToast('Erreur export semis');
+        console.error(err);
+    }
+}
+
+async function importSemisData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        if (data.type !== 'potager-semis-backup') {
+            showToast('Fichier non reconnu');
+            return;
+        }
+
+        if (!confirm('Cela remplacera toutes vos données semis. Continuer ?')) {
+            event.target.value = '';
+            return;
+        }
+
+        // Vider semis
+        await new Promise((resolve, reject) => {
+            const tx = db.transaction('semis', 'readwrite');
+            tx.objectStore('semis').clear();
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        });
+
+        // Vider historique
+        await new Promise((resolve, reject) => {
+            const tx = db.transaction('semisHistorique', 'readwrite');
+            tx.objectStore('semisHistorique').clear();
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        });
+
+        // Importer
+        for (const s of (data.semis || [])) {
+            await addSemis(s);
+        }
+        for (const h of (data.historique || [])) {
+            await addSemisHistorique(h);
+        }
+
+        showToast('Import semis réussi ✓');
+        if (typeof loadSemisList === 'function') loadSemisList();
+    } catch (err) {
+        showToast('Erreur import semis');
+        console.error(err);
+    }
+    event.target.value = '';
+}
+
+// ===== Export / Import Conseils =====
+
+async function exportConseilsData() {
+    try {
+        const conseils = await getAllConseils();
+        const data = {
+            type: 'potager-conseils-backup',
+            version: 1,
+            date: new Date().toISOString(),
+            conseils: conseils
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        const fileName = `POTA_Conseil-backup-${new Date().toISOString().split('T')[0]}.json`;
+        await saveAndShareFile(json, fileName);
+        showToast('Export conseils réussi ✓');
+    } catch (err) {
+        showToast('Erreur export conseils');
+        console.error(err);
+    }
+}
+
+async function importConseilsData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        if (data.type !== 'potager-conseils-backup') {
+            showToast('Fichier non reconnu');
+            return;
+        }
+
+        if (!confirm('Les conseils importés seront AJOUTÉS à vos conseils existants. Continuer ?')) {
+            event.target.value = '';
+            return;
+        }
+
+        let count = 0;
+        for (const c of (data.conseils || [])) {
+            const newConseil = { ...c };
+            delete newConseil.id;
+            await addConseil(newConseil);
+            count++;
+        }
+
+        showToast(`${count} conseil(s) importé(s) ✓`);
+
+        if (currentMode === 'conseils') {
+            loadConseilsList();
+        }
+    } catch (err) {
+        showToast('Erreur import conseils');
+        console.error(err);
+    }
+    event.target.value = '';
+}
+
+// ===== SAUVEGARDE COMPLÈTE =====
+async function exportTotal() {
+    try {
+        const calendrier = await new Promise((resolve, reject) => {
+            const tx = db.transaction('events', 'readonly');
+            const req = tx.objectStore('events').getAll();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+
+        const semis = await new Promise((resolve, reject) => {
+            const tx = db.transaction('semis', 'readonly');
+            const req = tx.objectStore('semis').getAll();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+
+        const semisHistorique = await new Promise((resolve, reject) => {
+            const tx = db.transaction('semisHistorique', 'readonly');
+            const req = tx.objectStore('semisHistorique').getAll();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+
+        const conseils = await getAllConseils();
+
+        const data = {
+            version: '1.0',
+            type: 'potager-total',
+            date: new Date().toISOString(),
+            calendrier,
+            semis,
+            semisHistorique,
+            conseils
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        const fileName = `POTA_Complet-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        await saveAndShareFile(json, fileName);
+        showToast('📦 Export total effectué !');
+    } catch (err) {
+        showToast('❌ Erreur export total');
+        console.error(err);
+    }
+}
+
+async function importTotal(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!confirm('⚠️ ATTENTION !\n\nCette action va ÉCRASER toutes vos données actuelles :\n• Calendrier\n• Semis + Historique\n• Conseils\n\nÊtes-vous sûr de vouloir continuer ?')) {
+        event.target.value = '';
+        return;
+    }
+
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        if (data.type !== 'potager-total') {
+            showToast('❌ Fichier invalide : pas une sauvegarde complète');
+            event.target.value = '';
+            return;
+        }
+
+        const stores = [
+            { name: 'events', items: data.calendrier || [] },
+            { name: 'semis', items: data.semis || [] },
+            { name: 'semisHistorique', items: data.semisHistorique || [] },
+            { name: 'conseils', items: data.conseils || [] }
+        ];
+
+        for (const s of stores) {
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(s.name, 'readwrite');
+                const store = tx.objectStore(s.name);
+                store.clear();
+                for (const item of s.items) {
+                    store.put(item);
+                }
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        showToast('✅ Restauration complète effectuée !');
+        setTimeout(() => location.reload(), 1000);
+    } catch (err) {
+        showToast('❌ Erreur de lecture du fichier');
+        console.error(err);
+    }
+    event.target.value = '';
+}
+
+// ===== Utilitaire =====
+
+function escapeHTML(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ==================== UTILS ====================
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function truncate(str, len) {
+  return str.length > len ? str.substring(0, len) + '…' : str;
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ==================== INIT ====================
+async function init() {
+  applyStoredTheme();
+  db = await openDB();
+  await autoUncheck();
+  renderCalendar();
+}
+
+init();
+// Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('POTA SW enregistré:', reg.scope))
+      .catch(err => console.log('POTA SW erreur:', err));
+  });
+}
+
+</script>
+</body>
+</html>
