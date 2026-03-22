@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pota-v1.02';
+const CACHE_NAME = 'pota-v1.6';
 const ASSETS = [
   './',
   './index.html',
