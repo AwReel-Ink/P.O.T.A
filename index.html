@@ -2781,7 +2781,7 @@ body.theme-bonbon {
       <hr>
       <p>Créé par <strong>Leroy Aurélien</strong></p>
       <p>© 2026 — Tous droits réservés</p>
-      <p>Version — 1.8</p>
+      <p>Version — 1.9</p>
     </div>
   </div>
 </div>
@@ -3216,31 +3216,40 @@ function applyStoredTheme() {
 }
 
 // ==================== INDEXED DB ====================
-// ===== REMPLACER la constante DB_VERSION =====
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 function openDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
         request.onupgradeneeded = (e) => {
             const db = e.target.result;
+            const tx = e.target.transaction;
 
-            // Stores existants (version 1)
+            // Store events + index month
             if (!db.objectStoreNames.contains('events')) {
-                db.createObjectStore('events', { keyPath: 'id', autoIncrement: true });
+                const eventsStore = db.createObjectStore('events', { keyPath: 'id', autoIncrement: true });
+                eventsStore.createIndex('month', 'month', { unique: false });
+            } else {
+                const eventsStore = tx.objectStore('events');
+                if (!eventsStore.indexNames.contains('month')) {
+                    eventsStore.createIndex('month', 'month', { unique: false });
+                }
             }
 
-            // Nouveaux stores (version 2)
+            // Store semis
             if (!db.objectStoreNames.contains('semis')) {
                 db.createObjectStore('semis', { keyPath: 'id', autoIncrement: true });
             }
+
+            // Store semisHistorique + index semisId
             if (!db.objectStoreNames.contains('semisHistorique')) {
-                const store = db.createObjectStore('semisHistorique', { keyPath: 'id', autoIncrement: true });
-                store.createIndex('semisId', 'semisId', { unique: false });
+                const histStore = db.createObjectStore('semisHistorique', { keyPath: 'id', autoIncrement: true });
+                histStore.createIndex('semisId', 'semisId', { unique: false });
             }
-            // Dans onupgradeneeded, ajouter :
+
+            // Store conseils
             if (!db.objectStoreNames.contains('conseils')) {
-              db.createObjectStore('conseils', { keyPath: 'id', autoIncrement: true });
+                db.createObjectStore('conseils', { keyPath: 'id', autoIncrement: true });
             }
         };
         request.onsuccess = () => resolve(request.result);
@@ -3418,6 +3427,7 @@ async function renderMonthView() {
     list.appendChild(li);
   }
 }
+
 // ==================== FLECHE NAVIGATION ====================
 function navigateMonth(direction) {
   currentMonth = (currentMonth + direction + 12) % 12;
