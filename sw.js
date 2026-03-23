@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pota-v1.6';
+const CACHE_NAME = 'pota-v1.7';
 const ASSETS = [
   './',
   './index.html',
@@ -26,6 +26,7 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  if (!e.request.url.startsWith('http')) return;
   e.respondWith(
     caches.match(e.request).then(cached => {
       const fetched = fetch(e.request).then(response => {
