@@ -1300,6 +1300,28 @@ body.theme-espace .event-item.multi-checked {
     font-weight: 700;
 }
 
+/* ===== ARROSAGE & CONTRÔLE ROW ===== */
+.arrosage-controle-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.arrosage-col,
+.controle-col {
+    flex: 1;
+    min-width: 180px;
+}
+
+.controle-col h3 {
+    margin-bottom: 8px;
+}
+
+#detail-semis-dernier-controle {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
 /* ===== HISTORIQUE ===== */
 .historique-list {
     max-height: 300px;
@@ -2759,7 +2781,7 @@ body.theme-bonbon {
       <hr>
       <p>Créé par <strong>Leroy Aurélien</strong></p>
       <p>© 2026 — Tous droits réservés</p>
-      <p>Version — 1.7</p>
+      <p>Version — 1.8</p>
     </div>
   </div>
 </div>
@@ -2867,13 +2889,21 @@ body.theme-bonbon {
             </div>
         </div>
 
-        <!-- Arrosage -->
-        <div class="detail-section">
-            <h3>💧 Arrosage</h3>
-            <div id="detail-semis-dernier-arrosage"></div>
-            <div id="detail-semis-prochain-arrosage"></div>
-            <button class="btn btn-primary" id="btn-arroser-semis" onclick="handleArroserSemis()">💧 Arrosé aujourd'hui</button>
+        <!-- Arrosage & Contrôle -->
+        <div class="detail-section arrosage-controle-row">
+            <div class="arrosage-col">
+                <h3>💧 Arrosage</h3>
+                <div id="detail-semis-dernier-arrosage"></div>
+                <div id="detail-semis-prochain-arrosage"></div>
+                <button class="btn btn-primary" id="btn-arroser-semis" onclick="handleArroserSemis()">💧 Arrosé aujourd'hui</button>
+            </div>
+            <div class="controle-col">
+                <h3>👁️ Contrôle</h3>
+                <div id="detail-semis-dernier-controle"></div>
+                <button class="btn btn-secondary" id="btn-controler-semis" onclick="handleControlerSemis()">👁️ Rien à signaler</button>
+            </div>
         </div>
+
 
         <!-- Historique -->
         <div class="detail-section">
@@ -4208,13 +4238,16 @@ async function loadSemisList() {
             .map(e => `<span class="semis-card-stat ${getEtatClass(e)}">${stats[e]} ${ETATS_LABELS[e].toLowerCase()}</span>`)
             .join('');
 
-        // Dernier contrôle (dernière entrée d'historique pour ce bac)
+        // Dernier contrôle et arrosage
         const bacHistorique = allHistorique
             .filter(h => h.semisId === s.id)
             .sort((a, b) => new Date(b.date) - new Date(a.date));
         const dernierControle = bacHistorique.length > 0
-            ? `<div class="semis-card-controle">🔎 ${formatDateSemis(bacHistorique[0].date)}</div>`
-            : `<div class="semis-card-controle">🔎 Aucun contrôle</div>`;
+            ? `<div class="semis-card-controle">👁️ ${formatDateSemis(bacHistorique[0].date)}</div>`
+            : `<div class="semis-card-controle">👁️ Aucun contrôle</div>`;
+        const dernierArrosage = s.dernierArrosage
+            ? `<div class="semis-card-controle">💧 ${formatDateSemis(s.dernierArrosage)}</div>`
+            : '';
 
         return `
             <div class="semis-card" onclick="openSemisDetail(${s.id})">
@@ -4224,6 +4257,7 @@ async function loadSemisList() {
                 </div>
                 ${s.lieu ? `<div class="semis-card-lieu">${s.lieu}</div>` : ''}
                 <div class="semis-card-stats">${statsHtml || '<span style="color:var(--text-secondary,#888)">Aucun godet</span>'}</div>
+                ${dernierArrosage}
                 ${dernierControle}
             </div>
         `;
@@ -4430,6 +4464,14 @@ async function renderArrosageDetail(semis) {
 
     document.getElementById('detail-semis-dernier-arrosage').innerHTML = dernierText;
     document.getElementById('detail-semis-prochain-arrosage').innerHTML = prochainText;
+        // Dernier contrôle
+    const allHist = await getSemisHistorique(currentSemisId);
+    const dernierControleHist = allHist
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    document.getElementById('detail-semis-dernier-controle').innerHTML = dernierControleHist
+        ? `<p>Dernier contrôle : <strong>${formatDateSemis(dernierControleHist.date)}</strong></p>`
+        : `<p>Dernier contrôle : <strong>Aucun</strong></p>`;
+
 }
 
 async function renderHistoriqueDetail(semis) {
@@ -4490,6 +4532,24 @@ async function handleArroserSemis() {
 }
 
 // ==============================
+// CONTRÔLE (RAS)
+// ==============================
+
+let controleMarque = false;
+
+function handleControlerSemis() {
+    controleMarque = !controleMarque;
+    const btn = document.getElementById('btn-controler-semis');
+    if (controleMarque) {
+        btn.textContent = '👁️ Contrôle marqué ✓';
+        btn.style.opacity = '0.7';
+    } else {
+        btn.textContent = '👁️ Rien à signaler';
+        btn.style.opacity = '1';
+    }
+}
+
+// ==============================
 // GRILLE ← DOM
 // ==============================
 
@@ -4518,13 +4578,18 @@ function saveSemisInitialValues(semis) {
         arrosage: false
     };
     arrosageMarque = false;
-    const btn = document.getElementById('btn-arroser-semis');
-    btn.textContent = '💧 Arrosé aujourd\'hui';
-    btn.style.opacity = '1';
+    controleMarque = false;
+    const btnA = document.getElementById('btn-arroser-semis');
+    btnA.textContent = '💧 Arrosé aujourd\'hui';
+    btnA.style.opacity = '1';
+    const btnC = document.getElementById('btn-controler-semis');
+    btnC.textContent = '👁️ Rien à signaler';
+    btnC.style.opacity = '1';
 }
 
 function hasSemisModifications(semis) {
     if (arrosageMarque) return true;
+    if (controleMarque) return true;
     if (JSON.stringify(getGrilleFromDOM(semis)) !== initialSemisValues.grille) return true;
     return false;
 }
@@ -4556,6 +4621,12 @@ async function handleEnregistrerEntretienSemis() {
     if (arrosageMarque) {
         histEntry.arrosage = true;
         semis.dernierArrosage = today;
+        hasEntryData = true;
+    }
+
+        // Contrôle
+    if (controleMarque) {
+        histEntry.controle = true;
         hasEntryData = true;
     }
 
