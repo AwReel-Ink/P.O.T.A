@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>|P|O|T|A|</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2d6a4f">
@@ -2604,6 +2604,140 @@ body.theme-bonbon {
   --green-accent: #69f0ae;
 }
 
+/* ==========================================================
+   CORRECTIFS AFFICHAGE — smartphone / tablette (v2.0)
+   ========================================================== */
+:root { --cell-size: 70px; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+
+/* En-tête : jamais plus large que l'écran, encoche / barre d'état iOS */
+.app-header {
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  padding-left: calc(16px + env(safe-area-inset-left, 0px));
+  padding-right: calc(16px + env(safe-area-inset-right, 0px));
+}
+.app-header h1 { white-space: nowrap; min-width: 0; }
+.btn-mode-toggle, .btn-header-left { white-space: nowrap; flex-shrink: 0; }
+.btn-mode-toggle .lbl-court { display: none; }
+
+/* Calendrier : colonnes qui rétrécissent vraiment (le texte tronqué élargissait la grille) */
+.months-grid { grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
+.month-card { min-width: 0; }
+.month-card .month-name { overflow-wrap: anywhere; }
+
+/* Liste des tâches : texte long sans débordement, boutons toujours visibles */
+.event-text { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.event-actions { flex-shrink: 0; }
+.btn-icon { min-width: 36px; min-height: 36px; }
+
+/* Bouton « Rien à signaler » : était blanc sur blanc dans la fiche du bac */
+.detail-section .btn-secondary {
+  background: var(--earth-light);
+  color: #fff;
+  backdrop-filter: none;
+}
+.detail-section .btn-secondary:hover { background: var(--earth); }
+.arrosage-col .btn, .controle-col .btn { margin-top: 4px; }
+
+/* Grille des godets : même taille de colonne en CSS et en JS */
+.grille-cell { width: var(--cell-size); min-height: var(--cell-size); }
+.grille-container { overflow: visible; }
+.detail-header h2 { min-width: 0; overflow-wrap: anywhere; }
+
+/* Fenêtres : défilement si l'écran est petit (paysage, clavier ouvert) */
+.modal {
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+}
+.modal-buttons { flex-wrap: wrap; }
+.data-page {
+  max-height: 85vh;
+  max-height: 85dvh;
+  width: calc(100% - 24px);
+  overscroll-behavior: contain;
+}
+.side-menu {
+  width: min(280px, 85vw);
+  right: 0;
+  transform: translateX(105%);
+  transition: transform 0.3s;
+  overflow-y: auto;
+  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+}
+.side-menu.active { transform: translateX(0); }
+
+/* Notification : au-dessus de la page Sauvegardes, lisible sur petit écran */
+.toast {
+  z-index: 3000;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Conseils : texte lisible sur les cartes et les filtres colorés */
+.conseil-card-extrait { color: inherit; opacity: 0.8; }
+.filtre-tag-label { color: inherit; background: color-mix(in srgb, var(--green-light) 18%, transparent); }
+.filtre-tag-label:has(input:checked) { color: #fff; }
+.conseil-detail-texte { white-space: pre-wrap; overflow-wrap: anywhere; }
+.conseil-card-titre, .conseil-detail-card h2 { overflow-wrap: anywhere; }
+/* thèmes clairs uniquement (les thèmes sombres ont leurs propres couleurs) */
+body:not(.theme-nuit):not(.theme-muertos):not(.theme-espace) .conseil-card { background: color-mix(in srgb, var(--green-light) 18%, white); color: #333; }
+body:not(.theme-nuit):not(.theme-muertos):not(.theme-espace) .conseil-detail-card { background: color-mix(in srgb, var(--green-light) 15%, white) !important; }
+body:not(.theme-nuit):not(.theme-muertos):not(.theme-espace) .conseil-form-card { background: color-mix(in srgb, var(--green-light) 15%, white); }
+body:not(.theme-nuit):not(.theme-muertos):not(.theme-espace) .data-page-content .btn-outline { background: color-mix(in srgb, var(--green-light) 25%, white); }
+
+/* Sur écran tactile : pas d'effet de survol qui reste « collé » */
+@media (hover: none) {
+  .month-card:hover, .conseil-card:hover, .semis-card:hover { transform: none; }
+}
+
+/* Tablette */
+@media (max-width: 900px) {
+  #semis-section { padding: 0 12px; }
+}
+
+/* Smartphone */
+@media (max-width: 600px) {
+  :root { --cell-size: 58px; }
+  .app-header { gap: 8px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: 10px; }
+  .app-header h1 { font-size: 1rem; }
+  .btn-mode-toggle { padding: 7px 12px; font-size: 0.82rem; }
+  .btn-mode-toggle .lbl-long { display: none; }
+  .btn-mode-toggle .lbl-court { display: inline; }
+  .btn-header-left { padding: 7px 10px; }
+  .months-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #monthTitle { gap: 10px; width: 100%; }
+  #monthTitle span { min-width: 0; font-size: 1.3rem; }
+  .month-header { justify-content: center; }
+  .month-actions { justify-content: center; }
+  .event-item { padding: 10px 12px; gap: 10px; }
+  .multi-bar { justify-content: center; }
+  .semis-view { padding: 10px 0; }
+  .detail-section { padding: 14px 12px; }
+  .grille-cell-nom { font-size: 0.62rem; }
+  /* iOS zoome sur les champs en dessous de 16 px */
+  input, select, textarea { font-size: 16px !important; }
+  .modal { padding: 18px; }
+  .modal-overlay { padding: 12px; }
+  .conseils-filtres-bar { justify-content: flex-start; }
+}
+
+@media (max-width: 380px) {
+  :root { --cell-size: 52px; }
+  .app-header { padding-left: calc(10px + env(safe-area-inset-left, 0px)); padding-right: calc(10px + env(safe-area-inset-right, 0px)); }
+  .app-header h1 { font-size: 0.9rem; }
+  .months-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Smartphone en paysage : en-tête compact */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-header { padding-top: calc(6px + env(safe-area-inset-top, 0px)); padding-bottom: 6px; }
+}
+
 </style>
 </head>
 <body>
@@ -2611,8 +2745,8 @@ body.theme-bonbon {
 <!-- HEADER -->
 <header class="app-header">
     <h1 id="app-title">📅 |P|O|T|A| 📅</h1>
-    <button class="btn-mode-toggle" id="btnModeToggle" onclick="cycleMode()">🌱 Mes Semis</button>
-    <button class="btn-header-left" onclick="openMenuPanel()">☰ Menu</button>
+    <button class="btn-mode-toggle" id="btnModeToggle" data-next="semis" onclick="cycleMode()"><span class="lbl-long">🌱 Mes Semis</span><span class="lbl-court">🌱 Semis</span></button>
+    <button class="btn-header-left" onclick="openMenuPanel()" aria-label="Menu">☰ Menu</button>
 </header>
 
 <!-- SIDE MENU -->
@@ -2636,6 +2770,11 @@ body.theme-bonbon {
     <button class="btn-close" onclick="closeDataPage()">✕</button>
   </div>
   <div class="data-page-content">
+    <h3>🏠 Synchronisation</h3>
+    <p style="font-size:0.8em;color:var(--text-secondary,#777);margin:0 0 8px;">Synchro automatique avec le serveur maison (sur le Wi-Fi de la maison)</p>
+    <button class="btn btn-outline" onclick="ouvrirServeurMaison()">🏠 Serveur maison</button>
+
+    <hr>
     <h3>📤 Partage entre jardiniers</h3>
     <p style="font-size:0.8em;color:var(--text-secondary,#777);margin:0 0 8px;">Exporter/importer sans écraser (fusion)</p>
     
@@ -2773,6 +2912,11 @@ body.theme-bonbon {
 
     <div class="theme-preview" id="themePreview"></div>
 
+    <div class="form-group" style="margin-top:16px">
+      <label>🔄 Synchronisation</label>
+      <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="closeSettings(); ouvrirServeurMaison()">🏠 Serveur maison</button>
+    </div>
+
     <div class="modal-buttons">
       <button class="btn btn-primary" onclick="closeSettings()">Fermer</button>
     </div>
@@ -2781,7 +2925,7 @@ body.theme-bonbon {
       <hr>
       <p>Créé par <strong>Leroy Aurélien</strong></p>
       <p>© 2026 — Tous droits réservés</p>
-      <p>Version — 1.9</p>
+      <p>Version — 2.0</p>
     </div>
   </div>
 </div>
@@ -2943,7 +3087,15 @@ body.theme-bonbon {
             <button type="button" class="btn btn-outline" onclick="previewGrilleModification()">👁️ Aperçu grille</button>
             <div id="modifier-grille-section" class="hidden">
                 <h3>Aperçu</h3>
-                <div id="modifier-grille-preview" class="grille-container"></div>
+                <div class="grille-scroll-container">
+                    <div class="semis-grille-wrapper">
+                        <div id="modifier-grille-preview" class="grille-container"></div>
+                        <div class="semis-reperes">
+                            <span class="repere-g">G</span>
+                            <span class="repere-d">D</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="modifier-noms-section" class="hidden">
                 <h3>Nommer les godets</h3>
@@ -3111,6 +3263,7 @@ body.theme-bonbon {
 
 </div>
 
+<script src="sync-maison.js"></script>
 <script>
 // ==================== CONFIG ====================
 const MONTHS = [
@@ -3186,6 +3339,7 @@ function changeTheme(theme) {
   
   // Mettre à jour les icônes
   MONTH_ICONS = THEME_ICONS[theme];
+  document.getElementById('themeSelect').value = theme;
   
   // Mettre à jour la preview
   updateThemePreview();
@@ -3216,97 +3370,200 @@ function applyStoredTheme() {
 }
 
 // ==================== INDEXED DB ====================
-const DB_VERSION = 4;
+// Version 5 : identifiants texte (crypto.randomUUID) au lieu des numéros
+// auto-incrémentés, champ updatedAt sur chaque enregistrement (synchro maison).
+const DB_VERSION = 5;
+const DATA_STORES = ['events', 'semis', 'semisHistorique', 'conseils'];
+const MIGRATION_BACKUP_STORE = 'sauvegardeAvantV5';
+let dbPromise = null;
+
+function newId() {
+  if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+// Index à (re)créer pour chaque store de données
+const STORE_INDEXES = {
+  events: (s) => s.createIndex('month', 'month', { unique: false }),
+  semis: () => {},
+  semisHistorique: (s) => s.createIndex('semisId', 'semisId', { unique: false }),
+  conseils: () => {}
+};
+
+function creerStoreDonnees(base, nom) {
+  const s = base.createObjectStore(nom, { keyPath: 'id' }); // pas d'autoIncrement
+  STORE_INDEXES[nom](s);
+  return s;
+}
 
 function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onupgradeneeded = (e) => {
-            const db = e.target.result;
-            const tx = e.target.transaction;
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => upgradeDB(request.result, request.transaction, e.oldVersion);
+    request.onsuccess = () => {
+      const base = request.result;
+      // Une nouvelle version de l'appli s'ouvre dans un autre onglet : on libère la base
+      base.onversionchange = () => {
+        base.close();
+        dbPromise = null;
+        toast('🔄 P.O.T.A a été mis à jour : rechargez la page');
+      };
+      resolve(base);
+    };
+    request.onerror = () => { dbPromise = null; reject(request.error); };
+    request.onblocked = () => toast('⚠️ Fermez les autres onglets de P.O.T.A pour terminer la mise à jour');
+  });
+  return dbPromise;
+}
 
-            // Store events + index month
-            if (!db.objectStoreNames.contains('events')) {
-                const eventsStore = db.createObjectStore('events', { keyPath: 'id', autoIncrement: true });
-                eventsStore.createIndex('month', 'month', { unique: false });
-            } else {
-                const eventsStore = tx.objectStore('events');
-                if (!eventsStore.indexNames.contains('month')) {
-                    eventsStore.createIndex('month', 'month', { unique: false });
-                }
-            }
+function upgradeDB(base, tx, oldVersion) {
+  // Stores existants encore en numéros auto-incrémentés → à migrer
+  const aMigrer = DATA_STORES.filter(n => base.objectStoreNames.contains(n) && tx.objectStore(n).autoIncrement);
+  // Stores absents (première installation ou très ancienne version)
+  for (const nom of DATA_STORES) {
+    if (!base.objectStoreNames.contains(nom)) creerStoreDonnees(base, nom);
+  }
+  // Index manquants sur des stores déjà au bon format
+  for (const nom of DATA_STORES) {
+    if (aMigrer.includes(nom)) continue;
+    const s = tx.objectStore(nom);
+    if (nom === 'events' && !s.indexNames.contains('month')) s.createIndex('month', 'month', { unique: false });
+    if (nom === 'semisHistorique' && !s.indexNames.contains('semisId')) s.createIndex('semisId', 'semisId', { unique: false });
+  }
+  if (aMigrer.length) migrerVersIdTexte(base, tx, aMigrer);
+}
 
-            // Store semis
-            if (!db.objectStoreNames.contains('semis')) {
-                db.createObjectStore('semis', { keyPath: 'id', autoIncrement: true });
-            }
+/*
+ * Migration unique des numéros auto-incrémentés vers des identifiants texte.
+ * Tout se passe dans la transaction de mise à jour de la base : si la vérification
+ * échoue (ou en cas d'erreur), la transaction est annulée et la base reste
+ * exactement dans son état précédent (version 4, données intactes).
+ * Une copie brute des anciennes données est aussi gardée dans « sauvegardeAvantV5 ».
+ */
+function migrerVersIdTexte(base, tx, noms) {
+  const anciens = {};
+  let restants = noms.length;
+  for (const nom of noms) {
+    const req = tx.objectStore(nom).getAll();
+    req.onsuccess = () => {
+      anciens[nom] = req.result || [];
+      if (--restants === 0) copier();
+    };
+  }
 
-            // Store semisHistorique + index semisId
-            if (!db.objectStoreNames.contains('semisHistorique')) {
-                const histStore = db.createObjectStore('semisHistorique', { keyPath: 'id', autoIncrement: true });
-                histStore.createIndex('semisId', 'semisId', { unique: false });
-            }
+  function copier() {
+    try {
+      const maintenant = Date.now();
 
-            // Store conseils
-            if (!db.objectStoreNames.contains('conseils')) {
-                db.createObjectStore('conseils', { keyPath: 'id', autoIncrement: true });
-            }
+      // 1. Copie brute de sécurité
+      if (!base.objectStoreNames.contains(MIGRATION_BACKUP_STORE)) {
+        base.createObjectStore(MIGRATION_BACKUP_STORE, { keyPath: 'store' });
+      }
+      const sauvegarde = tx.objectStore(MIGRATION_BACKUP_STORE);
+      for (const nom of noms) {
+        sauvegarde.put({ store: nom, date: new Date(maintenant).toISOString(), items: anciens[nom] });
+      }
+
+      // 2. Nouveaux identifiants + table de correspondance ancien numéro → nouvel id
+      const correspondance = {};
+      const nouveaux = {};
+      for (const nom of noms) {
+        correspondance[nom] = new Map();
+        nouveaux[nom] = anciens[nom].map(r => {
+          const id = newId();
+          correspondance[nom].set(String(r.id), id);
+          return Object.assign({}, r, { id, ancienId: r.id, updatedAt: maintenant });
+        });
+      }
+
+      // 3. Références entre stores : semisHistorique.semisId → semis.id
+      //    (seule référence entre stores dans P.O.T.A)
+      if (nouveaux.semisHistorique) {
+        const carte = correspondance.semis;
+        for (const h of nouveaux.semisHistorique) {
+          if (h.semisId === undefined || h.semisId === null || typeof h.semisId === 'string') continue;
+          h.ancienSemisId = h.semisId;
+          h.semisId = (carte && carte.get(String(h.semisId))) || ('orphelin-' + h.semisId);
+        }
+      }
+
+      // 4. Remplacement des stores (même nom, keyPath 'id', sans autoIncrement)
+      for (const nom of noms) {
+        base.deleteObjectStore(nom);
+        const s = creerStoreDonnees(base, nom);
+        for (const r of nouveaux[nom]) s.put(r);
+      }
+
+      // 5. Vérification : même nombre d'enregistrements, sinon annulation complète
+      for (const nom of noms) {
+        const c = tx.objectStore(nom).count();
+        c.onsuccess = () => {
+          if (c.result !== anciens[nom].length) {
+            console.error(`[POTA] Migration « ${nom} » : ${c.result} au lieu de ${anciens[nom].length}. Annulation.`);
+            try { tx.abort(); } catch (_) { /* déjà annulée */ }
+          }
         };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
+      }
+      console.log('[POTA] Migration vers des identifiants texte :',
+        noms.map(n => `${n} ${anciens[n].length}`).join(', '));
+    } catch (err) {
+      console.error('[POTA] Migration impossible, base laissée intacte :', err);
+      try { tx.abort(); } catch (_) { /* déjà annulée */ }
+    }
+  }
 }
 
-function getAllEvents() {
+// ---- Accès génériques ----
+async function dbRequete(store, mode, action) {
+  const base = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const store = tx.objectStore(STORE_NAME);
-    const req = store.getAll();
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = e => reject(e);
+    const tx = base.transaction(store, mode);
+    const req = action(tx.objectStore(store));
+    tx.oncomplete = () => resolve(req ? req.result : undefined);
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
   });
+}
+const dbGetAll = (store) => dbRequete(store, 'readonly', s => s.getAll());
+const dbGet = (store, id) => dbRequete(store, 'readonly', s => s.get(id));
+
+// ---- Synchro maison (ne bloque jamais l'appli) ----
+function syncModifie(store, rec) {
+  try {
+    if (window.SyncMaison) return Promise.resolve(SyncMaison.modifie(store, rec)).catch(e => console.warn('[SyncMaison]', e));
+  } catch (e) { console.warn('[SyncMaison]', e); }
+  return Promise.resolve();
+}
+function syncSupprime(store, id) {
+  try {
+    if (window.SyncMaison) return Promise.resolve(SyncMaison.supprime(store, id)).catch(e => console.warn('[SyncMaison]', e));
+  } catch (e) { console.warn('[SyncMaison]', e); }
+  return Promise.resolve();
 }
 
-function getEventsByMonth(month) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const store = tx.objectStore(STORE_NAME);
-    const idx = store.index('month');
-    const req = idx.getAll(month);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = e => reject(e);
-  });
+// Enregistre (ajout ou modification) : id texte, updatedAt, puis synchro.
+// options.garderDate : ne pas toucher updatedAt (imports de fichiers).
+async function enregistrer(store, rec, options = {}) {
+  if (rec.id === undefined || rec.id === null || rec.id === '') rec.id = newId();
+  if (!options.garderDate) rec.updatedAt = Date.now();
+  await dbRequete(store, 'readwrite', s => s.put(rec));
+  await syncModifie(store, rec);
+  return rec.id;
 }
 
-function addEvent(evt) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
-    const req = store.add(evt);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = e => reject(e);
-  });
+async function supprimer(store, id) {
+  await dbRequete(store, 'readwrite', s => s.delete(id));
+  await syncSupprime(store, id);
 }
 
-function updateEvent(evt) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
-    const req = store.put(evt);
-    req.onsuccess = () => resolve();
-    req.onerror = e => reject(e);
-  });
-}
-
-function deleteEvent(id) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
-    const req = store.delete(id);
-    req.onsuccess = () => resolve();
-    req.onerror = e => reject(e);
-  });
-}
+// ---- Calendrier ----
+const getAllEvents = () => dbGetAll(STORE_NAME);
+const getEventsByMonth = (month) => dbRequete(STORE_NAME, 'readonly', s => s.index('month').getAll(month));
+const getEvent = (id) => dbGet(STORE_NAME, id);
+const addEvent = (evt) => enregistrer(STORE_NAME, evt);
+const updateEvent = (evt) => enregistrer(STORE_NAME, evt);
+const deleteEvent = (id) => supprimer(STORE_NAME, id);
 
 // ==================== AUTO UNCHECK ====================
 async function autoUncheck() {
@@ -3416,11 +3673,11 @@ async function renderMonthView() {
     } else {
       // Mode normal
       li.innerHTML = `
-        <input type="checkbox" class="todo-check" ${evt.checked ? 'checked' : ''} onchange="toggleCheck(${evt.id}, this.checked)">
+        <input type="checkbox" class="todo-check" ${evt.checked ? 'checked' : ''} onchange="toggleCheck(${jsArg(evt.id)}, this.checked)">
         <div class="event-text">${periodTag}${escapeHTML(evt.description)}</div>
         <div class="event-actions">
-          <button class="btn-icon" title="Modifier" onclick="editEvent(${evt.id})">✏️</button>
-          <button class="btn-icon" title="Supprimer" onclick="confirmDeleteEvent(${evt.id})">🗑️</button>
+          <button class="btn-icon" title="Modifier" onclick="editEvent(${jsArg(evt.id)})">✏️</button>
+          <button class="btn-icon" title="Supprimer" onclick="confirmDeleteEvent(${jsArg(evt.id)})">🗑️</button>
         </div>
       `;
     }
@@ -3453,6 +3710,7 @@ function backToCalendar() {
   currentMonth = null;
   multiSelectMode = false;
   multiSelected.clear();
+  updateMultiUI();
   document.getElementById('calendar-view').classList.remove('hidden');
   document.getElementById('month-view').classList.remove('active');
   renderCalendar();
@@ -3483,9 +3741,8 @@ function openAddEventForMonth() {
 }
 
 async function editEvent(id) {
-  const events = await getAllEvents();
-  const evt = events.find(e => e.id === id);
-  if (!evt) return;
+  const evt = await getEvent(id);
+  if (!evt) { toast('Tâche introuvable'); renderMonthView(); return; }
   
   editingEventId = id;
   document.getElementById('modalTitle').textContent = '✏️ Modifier l\'événement';
@@ -3512,9 +3769,10 @@ async function saveEvent() {
   }
   
   if (editingEventId !== null) {
-    const events = await getAllEvents();
-    const evt = events.find(e => e.id === editingEventId);
-    if (evt) {
+    const evt = await getEvent(editingEventId);
+    if (!evt) {
+      toast('⚠️ Cette tâche a été supprimée entre-temps');
+    } else {
       evt.month = month;
       evt.period = period;
       evt.description = desc;
@@ -3544,9 +3802,8 @@ async function saveEvent() {
 
 // ==================== CHECK / UNCHECK ====================
 async function toggleCheck(id, checked) {
-  const events = await getAllEvents();
-  const evt = events.find(e => e.id === id);
-  if (!evt) return;
+  const evt = await getEvent(id);
+  if (!evt) { renderMonthView(); return; }
   evt.checked = checked;
   evt.checkedDate = checked ? new Date().toISOString() : null;
   await updateEvent(evt);
@@ -3556,7 +3813,7 @@ async function toggleCheck(id, checked) {
 // ==================== DELETE ====================
 function confirmDeleteEvent(id) {
   document.getElementById('confirmTitle').textContent = '🗑️ Supprimer';
-  document.getElementById('confirmText').textContent = 'Voulez-vous vraiment supprimer cet événement ?';
+  document.getElementById('confirmText').textContent = 'Voulez-vous vraiment supprimer cet événement ? Il sera aussi supprimé sur tous les appareils synchronisés.';
   document.getElementById('btnConfirm').onclick = async () => {
     await deleteEvent(id);
     closeConfirm();
@@ -3604,12 +3861,13 @@ function toggleMultiItem(id, checked) {
 function multiDelete() {
   if (!multiSelected.size) { toast('⚠️ Aucun élément sélectionné'); return; }
   document.getElementById('confirmTitle').textContent = '🗑️ Suppression multiple';
-  document.getElementById('confirmText').textContent = `Supprimer ${multiSelected.size} événement(s) ?`;
+  document.getElementById('confirmText').textContent = `Supprimer ${multiSelected.size} événement(s) ? Ils seront aussi supprimés sur tous les appareils synchronisés.`;
   document.getElementById('btnConfirm').onclick = async () => {
-    for (const id of multiSelected) await deleteEvent(id);
+    for (const id of [...multiSelected]) await deleteEvent(id);
     closeConfirm();
+    multiSelectMode = false;
     multiSelected.clear();
-    toggleMultiSelect();
+    updateMultiUI();
     toast('🗑️ Événements supprimés');
     renderMonthView();
   };
@@ -3628,24 +3886,20 @@ function closeMoveModal() {
 }
 
 async function confirmMove() {
-  const target = parseInt(document.getElementById('moveTarget').value);
-  const events = await getAllEvents();
-  for (const id of multiSelected) {
-    const evt = events.find(e => e.id === id);
-    if (evt) {
+  const target = parseInt(document.getElementById('moveTarget').value, 10);
+  for (const id of [...multiSelected]) {
+    const evt = await getEvent(id);
+    if (evt && evt.month !== target) {
       evt.month = target;
       await updateEvent(evt);
     }
   }
   closeMoveModal();
+  multiSelectMode = false;
   multiSelected.clear();
-  toggleMultiSelect();
+  updateMultiUI();
   toast(`📦 Déplacé vers ${MONTHS[target]}`);
   currentMonth = target;
-  document.getElementById('monthTitle').innerHTML = `
-  <button class="btn-nav" onclick="navigateMonth(-1)" title="Mois précédent">◀</button>
-  <span>${MONTH_ICONS[currentMonth]} ${MONTHS[currentMonth]}</span>
-  <button class="btn-nav" onclick="navigateMonth(1)" title="Mois suivant">▶</button>`;
   renderMonthView();
 }
 
@@ -3664,119 +3918,25 @@ function closeMenuPanel() {
 // CRUD SEMIS
 // ==============================
 
-async function addSemis(semis) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semis', 'readwrite');
-        const req = tx.objectStore('semis').add(semis);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function getSemis(id) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semis', 'readonly');
-        const req = tx.objectStore('semis').get(id);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function getAllSemis() {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semis', 'readonly');
-        const req = tx.objectStore('semis').getAll();
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function updateSemis(semis) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semis', 'readwrite');
-        const req = tx.objectStore('semis').put(semis);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function deleteSemis(id) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semis', 'readwrite');
-        const req = tx.objectStore('semis').delete(id);
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-    });
-}
+const addSemis = (semis) => enregistrer('semis', semis);
+const getSemis = (id) => dbGet('semis', id);
+const getAllSemis = () => dbGetAll('semis');
+const updateSemis = (semis) => enregistrer('semis', semis);
+const deleteSemis = (id) => supprimer('semis', id);
 
 // ==============================
 // CRUD HISTORIQUE SEMIS
 // ==============================
 
-async function addSemisHistorique(entry) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semisHistorique', 'readwrite');
-        const req = tx.objectStore('semisHistorique').add(entry);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
+const addSemisHistorique = (entry) => enregistrer('semisHistorique', entry);
+const updateSemisHistorique = (entry) => enregistrer('semisHistorique', entry);
+const getSemisHistorique = (semisId) => dbRequete('semisHistorique', 'readonly', s => s.index('semisId').getAll(semisId));
+const getAllSemisHistorique = () => dbGetAll('semisHistorique');
 
-async function updateSemisHistorique(entry) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semisHistorique', 'readwrite');
-        const req = tx.objectStore('semisHistorique').put(entry);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function getSemisHistorique(semisId) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semisHistorique', 'readonly');
-        const store = tx.objectStore('semisHistorique');
-        const index = store.index('semisId');
-        const req = index.getAll(semisId);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function getAllSemisHistorique() {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semisHistorique', 'readonly');
-        const req = tx.objectStore('semisHistorique').getAll();
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
+// Supprime tout l'historique d'un bac (et sur les autres appareils)
 async function deleteAllSemisHistorique(semisId) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('semisHistorique', 'readwrite');
-        const store = tx.objectStore('semisHistorique');
-        const index = store.index('semisId');
-        const req = index.openCursor(semisId);
-        req.onsuccess = (e) => {
-            const cursor = e.target.result;
-            if (cursor) {
-                cursor.delete();
-                cursor.continue();
-            }
-        };
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
-    });
+    const entrees = await getSemisHistorique(semisId);
+    for (const h of entrees) await supprimer('semisHistorique', h.id);
 }
 
 // ==============================
@@ -3796,60 +3956,11 @@ let currentMode = 'calendar'; // 'calendar' | 'semis' | 'conseils'
 
 // ===== Fonctions DB Conseils =====
 
-function addConseil(data) {
-  return new Promise((resolve, reject) => {
-    openDB().then(db => {
-      const tx = db.transaction('conseils', 'readwrite');
-      const req = tx.objectStore('conseils').add(data);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  });
-}
-
-function getAllConseils() {
-  return new Promise((resolve, reject) => {
-    openDB().then(db => {
-      const tx = db.transaction('conseils', 'readonly');
-      const req = tx.objectStore('conseils').getAll();
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  });
-}
-
-function getConseilById(id) {
-  return new Promise((resolve, reject) => {
-    openDB().then(db => {
-      const tx = db.transaction('conseils', 'readonly');
-      const req = tx.objectStore('conseils').get(id);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  });
-}
-
-function updateConseil(data) {
-  return new Promise((resolve, reject) => {
-    openDB().then(db => {
-      const tx = db.transaction('conseils', 'readwrite');
-      const req = tx.objectStore('conseils').put(data);
-      req.onsuccess = () => resolve();
-      req.onerror = () => reject(req.error);
-    });
-  });
-}
-
-function deleteConseil(id) {
-  return new Promise((resolve, reject) => {
-    openDB().then(db => {
-      const tx = db.transaction('conseils', 'readwrite');
-      const req = tx.objectStore('conseils').delete(id);
-      req.onsuccess = () => resolve();
-      req.onerror = () => reject(req.error);
-    });
-  });
-}
+const addConseil = (data) => enregistrer('conseils', data);
+const getAllConseils = () => dbGetAll('conseils');
+const getConseilById = (id) => dbGet('conseils', id);
+const updateConseil = (data) => enregistrer('conseils', data);
+const deleteConseil = (id) => supprimer('conseils', id);
 
 // ===== Navigation des modes =====
 function cycleMode() {
@@ -3863,15 +3974,31 @@ function cycleMode() {
     closeMenuPanel();
 }
 
+// Bouton de changement de section (libellé long + libellé court pour smartphone)
+const MODE_BOUTON = {
+  semis:      { long: '🌱 Mes Semis', court: '🌱 Semis' },
+  conseils:   { long: '💡 Mes Conseils & Astuces', court: '💡 Conseils' },
+  calendrier: { long: '📅 Mon Calendrier Potager', court: '📅 Calendrier' }
+};
+function setModeButton(suivant) {
+  const b = document.getElementById('btnModeToggle');
+  const l = MODE_BOUTON[suivant];
+  b.innerHTML = `<span class="lbl-long">${l.long}</span><span class="lbl-court">${l.court}</span>`;
+  b.setAttribute('data-next', suivant);
+  b.title = l.long.replace(/^\S+\s/, 'Aller à : ');
+}
+
 function showCalendarSection() {
   currentMode = 'calendar';
+  multiSelectMode = false;
+  multiSelected.clear();
+  updateMultiUI();
   document.getElementById('calendar-view').classList.remove('hidden');
   document.getElementById('month-view').classList.remove('hidden');
   document.getElementById('month-view').classList.remove('active');
   document.getElementById('semis-section').classList.add('hidden');
   document.getElementById('conseils-section').classList.add('hidden');
-  document.getElementById('btnModeToggle').textContent = '🌱 Mes Semis';
-  document.getElementById('btnModeToggle').setAttribute('data-next', 'semis');
+  setModeButton('semis');
   document.getElementById('app-title').textContent = '📅 |P|O|T|A| 📅';
   currentMonth = null;
   renderCalendar();
@@ -3883,8 +4010,8 @@ function showSemisSection() {
   document.getElementById('month-view').classList.add('hidden');
   document.getElementById('semis-section').classList.remove('hidden');
   document.getElementById('conseils-section').classList.add('hidden');
-  document.getElementById('btnModeToggle').textContent = '💡 Mes Conseils & Astuces';
-  document.getElementById('btnModeToggle').setAttribute('data-next', 'conseils');
+  setModeButton('conseils');
+  currentMonth = null;
   showSemisView('semis-list-view');
   loadSemisList();
 }
@@ -3895,9 +4022,8 @@ function showConseilsSection() {
   document.getElementById('month-view').classList.add('hidden');
   document.getElementById('semis-section').classList.add('hidden');
   document.getElementById('conseils-section').classList.remove('hidden');
-  document.getElementById('btnModeToggle').textContent = '📅 Mon Calendrier Potager';
-  document.getElementById('btnModeToggle').setAttribute('data-next', 'calendrier');
-  loadConseilsList();
+  setModeButton('calendrier');
+  showConseilView('liste');
 }
 
 // ===== Tags =====
@@ -3905,7 +4031,7 @@ function showConseilsSection() {
 function genererTagsBadges(tags) {
   if (!tags || tags.length === 0) return '';
   return '<div class="conseil-tags">' +
-    tags.map(t => `<span class="conseil-tag-badge" data-tag="${t}">${TAGS_CONSEILS[t] || t}</span>`).join('') +
+    tags.map(t => `<span class="conseil-tag-badge" data-tag="${escapeHTML(t)}">${escapeHTML(TAGS_CONSEILS[t] || t)}</span>`).join('') +
     '</div>';
 }
 
@@ -3946,7 +4072,7 @@ async function loadConseilsList() {
   conseilsFiltres.sort((a, b) => (b.dateCreation || '').localeCompare(a.dateCreation || ''));
 
   container.innerHTML = conseilsFiltres.map(c => `
-    <div class="conseil-card" onclick="openConseilDetail(${c.id})">
+    <div class="conseil-card" onclick="openConseilDetail(${jsArg(c.id)})">
       <div class="conseil-card-titre">${escapeHTML(c.titre)}</div>
       ${genererTagsBadges(c.tags)}
       <div class="conseil-card-extrait">${escapeHTML(c.texte)}</div>
@@ -3962,8 +4088,12 @@ function showConseilView(viewName) {
   document.getElementById('semis-section').classList.add('hidden');
   const conseilsSection = document.getElementById('conseils-section');
   conseilsSection.classList.remove('hidden');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.nav-btn[data-section="conseils"]')?.classList.add('active');
+  if (currentMode !== 'conseils') {
+    currentMode = 'conseils';
+    currentMonth = null;
+    setModeButton('calendrier');
+  }
+  window.scrollTo(0, 0);
 
   // Cacher toutes les vues
   document.querySelectorAll('#conseils-section .conseil-view').forEach(v => {
@@ -4007,7 +4137,7 @@ async function openConseilDetail(id) {
   document.getElementById('detail-conseil-texte').textContent = c.texte;
 
   const lienEl = document.getElementById('detail-conseil-lien');
-  if (c.lien) {
+  if (c.lien && /^https?:\/\//i.test(c.lien)) {
     lienEl.innerHTML = `<a href="${escapeHTML(c.lien)}" target="_blank" rel="noopener">🔗 Voir le lien</a>`;
   } else {
     lienEl.innerHTML = '';
@@ -4055,7 +4185,7 @@ async function handleCreationConseil(e) {
     lien: document.getElementById('conseil-lien').value.trim() || '',
     source: document.getElementById('conseil-source').value.trim() || '',
     tags,
-    dateCreation: new Date().toISOString().split('T')[0]
+    dateCreation: todayISOSemis()
   };
 
   await addConseil(conseilData);
@@ -4088,7 +4218,7 @@ async function openEditionConseil(id) {
 async function handleEditionConseil(e) {
   e.preventDefault();
 
-  const id = Number(document.getElementById('edit-conseil-id').value);
+  const id = document.getElementById('edit-conseil-id').value;
   const titre = document.getElementById('edit-conseil-titre').value.trim();
   const texte = document.getElementById('edit-conseil-texte').value.trim();
 
@@ -4106,16 +4236,21 @@ async function handleEditionConseil(e) {
   }
 
   const existant = await getConseilById(id);
+  if (!existant) {
+    showToast('⚠️ Ce conseil a été supprimé entre-temps');
+    showConseilView('liste');
+    return;
+  }
 
-  const conseilData = {
-    id,
+  // On part de l'enregistrement existant pour ne perdre aucun champ (ancienId…)
+  const conseilData = Object.assign(existant, {
     titre,
     texte,
     lien: document.getElementById('edit-conseil-lien').value.trim() || '',
     source: document.getElementById('edit-conseil-source').value.trim() || '',
     tags,
-    dateCreation: existant ? existant.dateCreation : new Date().toISOString().split('T')[0]
-  };
+    dateCreation: existant.dateCreation || todayISOSemis()
+  });
 
   await updateConseil(conseilData);
   showToast('Conseil modifié ✓');
@@ -4125,7 +4260,7 @@ async function handleEditionConseil(e) {
 // ===== Suppression =====
 
 async function deleteConseilConfirm(id) {
-  if (!confirm('Supprimer ce conseil ?')) return;
+  if (!confirm('Supprimer ce conseil ?\nIl sera aussi supprimé sur tous les appareils synchronisés.')) return;
   await deleteConseil(id);
   showToast('Conseil supprimé ✓');
   showConseilView('liste');
@@ -4164,6 +4299,12 @@ document.addEventListener('DOMContentLoaded', () => {
 function showSemisView(viewId) {
     document.querySelectorAll('.semis-view').forEach(v => v.classList.add('hidden'));
     document.getElementById(viewId).classList.remove('hidden');
+    window.scrollTo(0, 0);
+}
+
+function vueSemisVisible() {
+    const v = document.querySelector('#semis-section .semis-view:not(.hidden)');
+    return v ? v.id : null;
 }
 
 function retourListeSemis() {
@@ -4179,18 +4320,34 @@ function getCellNumero(r, c, colonnes, lignes) {
     return c * lignes + r + 1;
 }
 
+// Date du jour au format AAAA-MM-JJ, en heure locale
+// (toISOString donnait la date UTC : la veille entre minuit et 1-2 h du matin)
 function todayISOSemis() {
-    return new Date().toISOString().split('T')[0];
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// Lit une date « AAAA-MM-JJ » comme une date locale (et non UTC)
+function parseDateSemis(dateStr) {
+    if (!dateStr) return null;
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+    const d = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(dateStr);
+    return isNaN(d) ? null : d;
 }
 
 function formatDateSemis(dateStr) {
-    if (!dateStr) return '—';
-    const d = new Date(dateStr);
+    const d = parseDateSemis(dateStr);
+    if (!d) return '—';
     return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+function celluleGrille(semis, r, c) {
+    const cell = semis.grille && semis.grille[r] && semis.grille[r][c];
+    return cell || { nom: '', etat: 'attente' };
+}
+
 function getNextEtat(etat) {
-    const idx = ETATS_CYCLE.indexOf(etat);
+    const idx = Math.max(0, ETATS_CYCLE.indexOf(etat));
     return ETATS_CYCLE[(idx + 1) % ETATS_CYCLE.length];
 }
 
@@ -4199,11 +4356,7 @@ function getEtatClass(etat) {
 }
 
 function showToast(msg) {
-    const t = document.getElementById('toast');
-    if (!t) return;
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+    toast(msg);
 }
 
 // ==============================
@@ -4216,9 +4369,9 @@ async function loadSemisList() {
 
     list.sort((a, b) => {
         if (tri === 'lieu') {
-            return (a.lieu || '').localeCompare(b.lieu || '') || a.nom.localeCompare(b.nom);
+            return (a.lieu || '').localeCompare(b.lieu || '') || (a.nom || '').localeCompare(b.nom || '');
         }
-        return a.nom.localeCompare(b.nom);
+        return (a.nom || '').localeCompare(b.nom || '');
     });
 
     const container = document.getElementById('semis-list');
@@ -4237,8 +4390,8 @@ async function loadSemisList() {
         ETATS_CYCLE.forEach(e => stats[e] = 0);
         if (s.grille) {
             for (const row of s.grille) {
-                for (const cell of row) {
-                    stats[cell.etat] = (stats[cell.etat] || 0) + 1;
+                for (const cell of (row || [])) {
+                    if (cell && ETATS_LABELS[cell.etat]) stats[cell.etat] = (stats[cell.etat] || 0) + 1;
                 }
             }
         }
@@ -4251,7 +4404,7 @@ async function loadSemisList() {
         // Dernier contrôle et arrosage
         const bacHistorique = allHistorique
             .filter(h => h.semisId === s.id)
-            .sort((a, b) => new Date(b.date) - new Date(a.date));
+            .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const dernierControle = bacHistorique.length > 0
             ? `<div class="semis-card-controle">👁️ ${formatDateSemis(bacHistorique[0].date)}</div>`
             : `<div class="semis-card-controle">👁️ Aucun contrôle</div>`;
@@ -4260,12 +4413,12 @@ async function loadSemisList() {
             : '';
 
         return `
-            <div class="semis-card" onclick="openSemisDetail(${s.id})">
+            <div class="semis-card" onclick="openSemisDetail(${jsArg(s.id)})">
                 <div class="semis-card-header">
-                    <span class="semis-card-nom">${s.nom}</span>
+                    <span class="semis-card-nom">${escapeHTML(s.nom)}</span>
                     <span class="semis-card-dimensions">${s.lignes}×${s.colonnes}</span>
                 </div>
-                ${s.lieu ? `<div class="semis-card-lieu">${s.lieu}</div>` : ''}
+                ${s.lieu ? `<div class="semis-card-lieu">${escapeHTML(s.lieu)}</div>` : ''}
                 <div class="semis-card-stats">${statsHtml || '<span style="color:var(--text-secondary,#888)">Aucun godet</span>'}</div>
                 ${dernierArrosage}
                 ${dernierControle}
@@ -4286,13 +4439,13 @@ function openCreationSemis() {
 }
 
 function previewGrilleCreation() {
-    const lignes = parseInt(document.getElementById('creation-semis-lignes').value) || 1;
-    const colonnes = parseInt(document.getElementById('creation-semis-colonnes').value) || 1;
+    const lignes = borner(document.getElementById('creation-semis-lignes').value, 1);
+    const colonnes = borner(document.getElementById('creation-semis-colonnes').value, 1);
 
     // Grille preview
     const container = document.getElementById('creation-grille-preview');
     container.innerHTML = '';
-    container.style.gridTemplateColumns = `repeat(${colonnes}, 70px)`;
+    container.style.gridTemplateColumns = `repeat(${colonnes}, var(--cell-size))`;
     container.classList.add('grille-table');
 
     for (let r = 0; r < lignes; r++) {
@@ -4333,8 +4486,8 @@ async function handleCreationSemis(e) {
 
     const nom = document.getElementById('creation-semis-nom').value.trim();
     const lieu = document.getElementById('creation-semis-lieu').value.trim();
-    const lignes = parseInt(document.getElementById('creation-semis-lignes').value) || 1;
-    const colonnes = parseInt(document.getElementById('creation-semis-colonnes').value) || 1;
+    const lignes = borner(document.getElementById('creation-semis-lignes').value, 1);
+    const colonnes = borner(document.getElementById('creation-semis-colonnes').value, 1);
 
     if (!nom) return;
 
@@ -4399,22 +4552,22 @@ async function openSemisDetail(id) {
 function renderGrilleDetail(semis) {
     const container = document.getElementById('detail-semis-grille');
     container.innerHTML = '';
-    container.style.gridTemplateColumns = `repeat(${semis.colonnes}, 70px)`;
+    container.style.gridTemplateColumns = `repeat(${semis.colonnes}, var(--cell-size))`;
     container.classList.add('grille-table');
 
     for (let r = 0; r < semis.lignes; r++) {
         for (let c = 0; c < semis.colonnes; c++) {
-            const cell = semis.grille[r][c];
+            const cell = celluleGrille(semis, r, c);
             const num = getCellNumero(r, c, semis.colonnes, semis.lignes);
             const div = document.createElement('div');
             div.className = `grille-cell ${getEtatClass(cell.etat)}`;
             div.dataset.row = r;
             div.dataset.col = c;
-            div.title = `${cell.nom || 'Case ' + num} (${ETATS_LABELS[cell.etat]}) — Cliquer pour changer`;
+            div.title = `${cell.nom || 'Case ' + num} (${ETATS_LABELS[cell.etat] || cell.etat}) — Cliquer pour changer`;
 
             div.innerHTML = `
                 <span class="grille-cell-numero">${num}</span>
-                <span class="grille-cell-nom" lang="fr">${cell.nom || ''}</span>
+                <span class="grille-cell-nom" lang="fr">${escapeHTML(cell.nom)}</span>
             `;
 
             div.addEventListener('click', () => {
@@ -4435,7 +4588,7 @@ function renderGrilleDetail(semis) {
 
 async function renderArrosageDetail(semis) {
     const historique = await getSemisHistorique(semis.id);
-    const arrosages = historique.filter(h => h.arrosage).sort((a, b) => new Date(b.date) - new Date(a.date));
+    const arrosages = historique.filter(h => h.arrosage).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
     let dernierText = '<strong>Dernier arrosage :</strong> Aucun';
     let prochainText = '';
@@ -4447,8 +4600,8 @@ async function renderArrosageDetail(semis) {
             // Calcul par médiane des intervalles
             const intervalles = [];
             for (let i = 0; i < arrosages.length - 1; i++) {
-                const d1 = new Date(arrosages[i].date);
-                const d2 = new Date(arrosages[i + 1].date);
+                const d1 = parseDateSemis(arrosages[i].date);
+                const d2 = parseDateSemis(arrosages[i + 1].date);
                 const jours = Math.round((d1 - d2) / (1000 * 60 * 60 * 24));
                 if (jours > 0) intervalles.push(jours);
             }
@@ -4461,9 +4614,9 @@ async function renderArrosageDetail(semis) {
                     ? Math.round((intervalles[mid - 1] + intervalles[mid]) / 2)
                     : intervalles[mid];
 
-                const prochainDate = new Date(arrosages[0].date);
+                const prochainDate = parseDateSemis(arrosages[0].date);
                 prochainDate.setDate(prochainDate.getDate() + mediane);
-                prochainText = `<strong>Prochain arrosage estimé :</strong> <span class="highlight">${formatDateSemis(prochainDate.toISOString())} (≈ tous les ${mediane} jours)</span>`;
+                prochainText = `<strong>Prochain arrosage estimé :</strong> <span class="highlight">${prochainDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })} (≈ tous les ${mediane} jours)</span>`;
             } else {
                 prochainText = '<strong>Prochain arrosage estimé :</strong> Pas assez de données';
             }
@@ -4474,10 +4627,10 @@ async function renderArrosageDetail(semis) {
 
     document.getElementById('detail-semis-dernier-arrosage').innerHTML = dernierText;
     document.getElementById('detail-semis-prochain-arrosage').innerHTML = prochainText;
-        // Dernier contrôle
-    const allHist = await getSemisHistorique(currentSemisId);
-    const dernierControleHist = allHist
-        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    // Dernier contrôle
+    const dernierControleHist = historique
+        .slice()
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
     document.getElementById('detail-semis-dernier-controle').innerHTML = dernierControleHist
         ? `<p>Dernier contrôle : <strong>${formatDateSemis(dernierControleHist.date)}</strong></p>`
         : `<p>Dernier contrôle : <strong>Aucun</strong></p>`;
@@ -4486,7 +4639,7 @@ async function renderArrosageDetail(semis) {
 
 async function renderHistoriqueDetail(semis) {
     const historique = await getSemisHistorique(semis.id);
-    historique.sort((a, b) => new Date(b.date) - new Date(a.date));
+    historique.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
     const container = document.getElementById('detail-semis-historique');
 
@@ -4498,13 +4651,14 @@ async function renderHistoriqueDetail(semis) {
     container.innerHTML = historique.map(h => {
         const details = [];
         if (h.arrosage) details.push('💧 Arrosage');
+        if (h.controle) details.push('👁️ Contrôle');
         if (h.grilleSnapshot) {
             // Compter les changements
             const stats = {};
             ETATS_CYCLE.forEach(e => stats[e] = 0);
             for (const row of h.grilleSnapshot) {
-                for (const cell of row) {
-                    stats[cell.etat] = (stats[cell.etat] || 0) + 1;
+                for (const cell of (row || [])) {
+                    if (cell && ETATS_LABELS[cell.etat]) stats[cell.etat] = (stats[cell.etat] || 0) + 1;
                 }
             }
             const changes = ETATS_CYCLE
@@ -4564,13 +4718,18 @@ function handleControlerSemis() {
 // ==============================
 
 function getGrilleFromDOM(semis) {
-    const grille = JSON.parse(JSON.stringify(semis.grille));
+    const grille = [];
+    for (let r = 0; r < semis.lignes; r++) {
+        const row = [];
+        for (let c = 0; c < semis.colonnes; c++) row.push(Object.assign({}, celluleGrille(semis, r, c)));
+        grille.push(row);
+    }
     const cells = document.querySelectorAll('#detail-semis-grille .grille-cell');
 
     cells.forEach(div => {
-        const r = parseInt(div.dataset.row);
-        const c = parseInt(div.dataset.col);
-        if (div.dataset.etat) {
+        const r = parseInt(div.dataset.row, 10);
+        const c = parseInt(div.dataset.col, 10);
+        if (div.dataset.etat && grille[r] && grille[r][c]) {
             grille[r][c].etat = div.dataset.etat;
         }
     });
@@ -4582,9 +4741,15 @@ function getGrilleFromDOM(semis) {
 // ENREGISTRER ENTRETIEN
 // ==============================
 
+// Une saisie d'entretien est-elle en cours (cases cliquées, arrosage/contrôle marqué) ?
+function entretienEnCours() {
+    return arrosageMarque || controleMarque ||
+        !!document.querySelector('#detail-semis-grille .grille-cell[data-etat]');
+}
+
 function saveSemisInitialValues(semis) {
     initialSemisValues = {
-        grille: JSON.stringify(semis.grille),
+        grille: JSON.stringify(getGrilleFromDOM(semis)),
         arrosage: false
     };
     arrosageMarque = false;
@@ -4600,7 +4765,7 @@ function saveSemisInitialValues(semis) {
 function hasSemisModifications(semis) {
     if (arrosageMarque) return true;
     if (controleMarque) return true;
-    if (JSON.stringify(getGrilleFromDOM(semis)) !== initialSemisValues.grille) return true;
+    if (JSON.stringify(semis.grille) !== initialSemisValues.grille) return true;
     return false;
 }
 
@@ -4662,62 +4827,84 @@ async function handleEnregistrerEntretienSemis() {
 // MODIFICATION D'UN BAC
 // ==============================
 
+let semisEnModification = null;
+
 async function handleOpenModifierSemis() {
     const semis = await getSemis(currentSemisId);
     if (!semis) return;
+    semisEnModification = semis;
 
     showSemisView('semis-modifier-view');
 
     document.getElementById('modifier-semis-id').value = semis.id;
-    document.getElementById('modifier-semis-nom').value = semis.nom;
+    document.getElementById('modifier-semis-nom').value = semis.nom || '';
     document.getElementById('modifier-semis-lieu').value = semis.lieu || '';
     document.getElementById('modifier-semis-lignes').value = semis.lignes;
     document.getElementById('modifier-semis-colonnes').value = semis.colonnes;
 
-    // Afficher noms des cases
-        const container = document.getElementById('modifier-semis-noms');
-    container.innerHTML = '';
-    const totalCells = semis.lignes * semis.colonnes;
-    for (let num = 1; num <= totalCells; num++) {
-        const c = Math.floor((num - 1) / semis.lignes);
-        const r = (num - 1) % semis.lignes;
-        const cell = semis.grille[r] && semis.grille[r][c] ? semis.grille[r][c] : { nom: '' };
-        const div = document.createElement('div');
-        div.className = 'grid-name-row';
-        div.innerHTML = `
-            <span class="cell-label">${num} —</span>
-            <input type="text" data-row="${r}" data-col="${c}" value="${cell.nom || ''}" placeholder="Nom (facultatif)">
-        `;
-        container.appendChild(div);
-    }
-
+    document.getElementById('modifier-semis-noms').innerHTML = '';
     document.getElementById('modifier-grille-section').classList.remove('hidden');
     document.getElementById('modifier-noms-section').classList.remove('hidden');
 
-    // Preview grille
+    // Aperçu de la grille + champs des noms
     previewGrilleModification();
 }
 
+function borner(valeur, defaut) {
+    const n = parseInt(valeur, 10);
+    if (!Number.isFinite(n)) return defaut;
+    return Math.min(20, Math.max(1, n));
+}
+
+// Aperçu de la grille ET liste des noms adaptée aux nouvelles dimensions
+// (les noms déjà saisis sont conservés).
 function previewGrilleModification() {
-    const lignes = parseInt(document.getElementById('modifier-semis-lignes').value) || 1;
-    const colonnes = parseInt(document.getElementById('modifier-semis-colonnes').value) || 1;
+    const semis = semisEnModification || { lignes: 1, colonnes: 1, grille: [] };
+    const lignes = borner(document.getElementById('modifier-semis-lignes').value, semis.lignes || 1);
+    const colonnes = borner(document.getElementById('modifier-semis-colonnes').value, semis.colonnes || 1);
+
+    // Noms actuellement saisis
+    const saisis = {};
+    document.querySelectorAll('#modifier-semis-noms input').forEach(input => {
+        saisis[input.dataset.row + ',' + input.dataset.col] = input.value;
+    });
+    const nomDe = (r, c) => {
+        const k = r + ',' + c;
+        if (k in saisis) return saisis[k];
+        return celluleGrille(semis, r, c).nom || '';
+    };
 
     const container = document.getElementById('modifier-grille-preview');
     container.innerHTML = '';
-    container.style.gridTemplateColumns = `repeat(${colonnes}, 70px)`;
+    container.style.gridTemplateColumns = `repeat(${colonnes}, var(--cell-size))`;
     container.classList.add('grille-table');
 
     for (let r = 0; r < lignes; r++) {
         for (let c = 0; c < colonnes; c++) {
             const num = getCellNumero(r, c, colonnes, lignes);
+            const etat = (r < semis.lignes && c < semis.colonnes) ? celluleGrille(semis, r, c).etat : 'attente';
             const div = document.createElement('div');
-            div.className = 'grille-cell etat-attente';
+            div.className = 'grille-cell ' + getEtatClass(ETATS_LABELS[etat] ? etat : 'attente');
             div.innerHTML = `
                 <span class="grille-cell-numero">${num}</span>
-                <span class="grille-cell-nom" lang="fr"></span>
+                <span class="grille-cell-nom" lang="fr">${escapeHTML(nomDe(r, c))}</span>
             `;
             container.appendChild(div);
         }
+    }
+
+    const noms = document.getElementById('modifier-semis-noms');
+    noms.innerHTML = '';
+    for (let num = 1; num <= lignes * colonnes; num++) {
+        const c = Math.floor((num - 1) / lignes);
+        const r = (num - 1) % lignes;
+        const div = document.createElement('div');
+        div.className = 'grid-name-row';
+        div.innerHTML = `
+            <span class="cell-label">${num} —</span>
+            <input type="text" data-row="${r}" data-col="${c}" value="${escapeHTML(nomDe(r, c))}" placeholder="Nom (facultatif)">
+        `;
+        noms.appendChild(div);
     }
 }
 
@@ -4725,37 +4912,37 @@ async function handleModifierSemis(e) {
     e.preventDefault();
 
     const semis = await getSemis(currentSemisId);
-    if (!semis) return;
+    if (!semis) {
+        showToast('⚠️ Ce bac a été supprimé entre-temps');
+        retourListeSemis();
+        return;
+    }
 
     const nom = document.getElementById('modifier-semis-nom').value.trim();
     if (!nom) return;
 
-    const newLignes = parseInt(document.getElementById('modifier-semis-lignes').value) || semis.lignes;
-    const newColonnes = parseInt(document.getElementById('modifier-semis-colonnes').value) || semis.colonnes;
+    const newLignes = borner(document.getElementById('modifier-semis-lignes').value, semis.lignes);
+    const newColonnes = borner(document.getElementById('modifier-semis-colonnes').value, semis.colonnes);
 
-    // Recréer la grille si dimensions changées
-    if (newLignes !== semis.lignes || newColonnes !== semis.colonnes) {
-        const newGrille = [];
-        for (let r = 0; r < newLignes; r++) {
-            const row = [];
-            for (let c = 0; c < newColonnes; c++) {
-                if (r < semis.lignes && c < semis.colonnes) {
-                    row.push(semis.grille[r][c]);
-                } else {
-                    row.push({ nom: '', etat: 'attente' });
-                }
-            }
-            newGrille.push(row);
+    // Grille aux nouvelles dimensions (les godets existants gardent leur état)
+    const newGrille = [];
+    for (let r = 0; r < newLignes; r++) {
+        const row = [];
+        for (let c = 0; c < newColonnes; c++) {
+            row.push((r < semis.lignes && c < semis.colonnes)
+                ? Object.assign({}, celluleGrille(semis, r, c))
+                : { nom: '', etat: 'attente' });
         }
-        semis.grille = newGrille;
-        semis.lignes = newLignes;
-        semis.colonnes = newColonnes;
+        newGrille.push(row);
     }
+    semis.grille = newGrille;
+    semis.lignes = newLignes;
+    semis.colonnes = newColonnes;
 
-    // Mettre à jour les noms des cases
+    // Noms des cases
     document.querySelectorAll('#modifier-semis-noms input').forEach(input => {
-        const r = parseInt(input.dataset.row);
-        const c = parseInt(input.dataset.col);
+        const r = parseInt(input.dataset.row, 10);
+        const c = parseInt(input.dataset.col, 10);
         if (r < semis.lignes && c < semis.colonnes) {
             semis.grille[r][c].nom = input.value.trim();
         }
@@ -4765,6 +4952,7 @@ async function handleModifierSemis(e) {
     semis.lieu = document.getElementById('modifier-semis-lieu').value.trim() || '';
 
     await updateSemis(semis);
+    semisEnModification = null;
     showToast('Modifications enregistrées ✓');
     openSemisDetail(currentSemisId);
 }
@@ -4774,10 +4962,11 @@ async function handleModifierSemis(e) {
 // ==============================
 
 async function handleSupprimerSemis() {
-    if (!confirm('Supprimer ce bac de semis et tout son historique ?')) return;
+    if (!confirm('Supprimer ce bac de semis et tout son historique ?\nIls seront aussi supprimés sur tous les appareils synchronisés.')) return;
 
-    await deleteSemis(currentSemisId);
-    await deleteAllSemisHistorique(currentSemisId);
+    const id = currentSemisId;
+    await deleteAllSemisHistorique(id);
+    await deleteSemis(id);
     currentSemisId = null;
     showToast('Bac supprimé ✓');
     retourListeSemis();
@@ -4818,20 +5007,156 @@ async function saveAndShareFile(json, fileName) {
     }
 }
 
+// ==================== OUTILS D'IMPORT ====================
+// Les fichiers peuvent être à l'ancien format (id numériques, avant la v2.0)
+// ou au nouveau format (id texte + updatedAt).
+
+// Ancien identifiant : un nombre (ou un texte qui n'est que des chiffres)
+function estAncienId(id) {
+  return typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id));
+}
+
+// updatedAt du fichier s'il est valide, sinon 1 (= donnée ancienne :
+// elle ne doit pas écraser une version plus récente sur le serveur)
+function updatedAtImport(v) {
+  if (typeof v === 'number' && Number.isFinite(v) && v > 0) return v;
+  if (typeof v === 'string' && v.trim() && !isNaN(Date.parse(v))) return v;
+  return 1;
+}
+
+function dateMs(v) {
+  if (typeof v === 'number') return v;
+  const t = Date.parse(v);
+  return isNaN(t) ? 0 : t;
+}
+
+/*
+ * Prépare les enregistrements d'un fichier :
+ *  - id texte conservé tel quel (nouveau format) ;
+ *  - ancien numéro → nouvel id (crypto.randomUUID), numéro gardé dans ancienId ;
+ *    si `reutiliser` est fourni (Map ancienId → id local), l'id local est repris
+ *    (cas d'une restauration sur l'appareil qui a fait la migration) ;
+ *  - updatedAt du fichier, sinon 1.
+ * Renvoie aussi la correspondance ancien numéro → nouvel id (pour semisId).
+ */
+function convertirImport(items, reutiliser) {
+  const correspondance = new Map();
+  const sortie = [];
+  const vus = new Set();
+  for (const it of (Array.isArray(items) ? items : [])) {
+    if (!it || typeof it !== 'object') continue;
+    const r = Object.assign({}, it);
+    if (r.id === undefined || r.id === null || r.id === '') {
+      r.id = newId();
+    } else if (estAncienId(r.id)) {
+      const ancien = String(r.id);
+      const id = (reutiliser && reutiliser.get(ancien)) || newId();
+      correspondance.set(ancien, id);
+      if (r.ancienId === undefined) r.ancienId = it.id;
+      r.id = id;
+    } else {
+      r.id = String(r.id);
+    }
+    if (vus.has(r.id)) continue; // doublon dans le fichier
+    vus.add(r.id);
+    r.updatedAt = updatedAtImport(it.updatedAt);
+    sortie.push(r);
+  }
+  return { items: sortie, correspondance };
+}
+
+// Map ancienId → id des enregistrements locaux issus de la migration
+function carteAnciensIds(existants) {
+  const m = new Map();
+  for (const e of existants) {
+    if (e.ancienId !== undefined && e.ancienId !== null) m.set(String(e.ancienId), e.id);
+  }
+  return m;
+}
+
+// Met à jour semisHistorique.semisId selon la correspondance des semis
+function corrigerSemisId(historique, correspondance) {
+  for (const h of historique) {
+    if (estAncienId(h.semisId)) {
+      const ancien = String(h.semisId);
+      if (h.ancienSemisId === undefined) h.ancienSemisId = h.semisId;
+      h.semisId = correspondance.get(ancien) || ('orphelin-' + ancien);
+    } else if (h.semisId !== undefined && h.semisId !== null) {
+      h.semisId = String(h.semisId);
+    }
+  }
+}
+
+// Remplace TOUT le contenu d'un store par `nouveaux`, puis synchronise :
+// modifie pour chaque élément importé, supprime pour ce qui disparaît.
+async function remplacerStore(store, nouveaux) {
+  const existants = await dbGetAll(store);
+  const gardes = new Set(nouveaux.map(r => r.id));
+  const disparus = existants.filter(e => !gardes.has(e.id)).map(e => e.id);
+  const base = await openDB();
+  await new Promise((resolve, reject) => {
+    const tx = base.transaction(store, 'readwrite');
+    const s = tx.objectStore(store);
+    s.clear();
+    for (const r of nouveaux) s.put(r);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+  for (const id of disparus) await syncSupprime(store, id);
+  for (const r of nouveaux) await syncModifie(store, r);
+  return { importes: nouveaux.length, supprimes: disparus.length };
+}
+
+// Fusion (sans rien supprimer) : un élément déjà présent (même id) n'est remplacé
+// que si la version du fichier est plus récente ; un élément sans id texte
+// identique à un élément existant (même contenu) est ignoré.
+async function fusionnerStore(store, items, cleContenu) {
+  const existants = await dbGetAll(store);
+  const parId = new Map(existants.map(e => [e.id, e]));
+  const contenus = new Set(existants.map(cleContenu));
+  let ajoutes = 0, maj = 0;
+  for (const source of (Array.isArray(items) ? items : [])) {
+    const r = convertirImport([source]).items[0];
+    if (!r) continue;
+    const avaitIdTexte = typeof source.id === 'string' && source.id !== '' && !estAncienId(source.id);
+    const local = parId.get(r.id);
+    if (local) {
+      if (dateMs(r.updatedAt) <= dateMs(local.updatedAt)) continue; // la version locale est à jour
+    } else if (!avaitIdTexte && contenus.has(cleContenu(r))) {
+      continue; // déjà présent (ancien fichier réimporté)
+    }
+    await enregistrer(store, r, { garderDate: true });
+    parId.set(r.id, r);
+    contenus.add(cleContenu(r));
+    if (local) maj++; else ajoutes++;
+  }
+  return { ajoutes, maj };
+}
+
+function lireFichierJSON(event) {
+  const file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if (!file) return null;
+  return file.text().then(t => JSON.parse(t));
+}
+
 // ==================== CALENDRIER EXPORT / IMPORT ====================
 async function exportData() {
     closeMenuPanel();
     try {
         const events = await getAllEvents();
         const json = JSON.stringify(events.map(e => ({
+            id: e.id,
             month: e.month,
             period: e.period,
             description: e.description,
             checked: e.checked,
-            checkedDate: e.checkedDate
+            checkedDate: e.checkedDate,
+            updatedAt: e.updatedAt
         })), null, 2);
 
-        const fileName = `POTA_Calendrier-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        const fileName = `POTA_Calendrier-backup-${todayISOSemis()}.json`;
         await saveAndShareFile(json, fileName);
         toast('📤 Sauvegarde exportée');
     } catch (e) {
@@ -4846,38 +5171,36 @@ function triggerImport() {
 }
 
 async function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
     try {
-        const text = await file.text();
-        const data = JSON.parse(text);
-
+        const data = await lireFichierJSON(event);
+        if (data === null) return;
         if (!Array.isArray(data)) throw new Error('Format invalide');
 
-        let count = 0;
-        for (const item of data) {
-            if (typeof item.month === 'number' && item.month >= 0 && item.month <= 11 && item.description) {
-                await addEvent({
-                    month: item.month,
-                    period: item.period || '',
-                    description: item.description,
-                    checked: item.checked || false,
-                    checkedDate: item.checkedDate || null
-                });
-                count++;
-            }
-        }
+        const valides = data.filter(item => item && typeof item.month === 'number' &&
+            item.month >= 0 && item.month <= 11 && item.description)
+            .map(item => ({
+                id: item.id,
+                month: item.month,
+                period: item.period || '',
+                description: String(item.description),
+                checked: !!item.checked,
+                checkedDate: item.checkedDate || null,
+                updatedAt: item.updatedAt
+            }));
 
-        toast(`📥 ${count} événement(s) importé(s)`);
+        if (!valides.length) { toast('⚠️ Aucun événement valide dans ce fichier'); return; }
+        if (!confirm(`Ajouter ${valides.length} événement(s) au calendrier ?\nLes ajouts seront aussi envoyés sur tous les appareils synchronisés.`)) return;
+
+        const { ajoutes, maj } = await fusionnerStore('events', valides,
+            e => `${e.month}|${e.period || ''}|${(e.description || '').trim()}`);
+
+        toast(`📥 ${ajoutes} événement(s) importé(s)` + (maj ? `, ${maj} mis à jour` : ''));
         if (currentMonth !== null) renderMonthView();
         else renderCalendar();
     } catch (e) {
         toast('❌ Erreur lors de l\'import');
         console.error(e);
     }
-
-    event.target.value = '';
 }
 
 // ==============================
@@ -4890,14 +5213,14 @@ async function exportSemisData() {
         const historique = await getAllSemisHistorique();
         const data = {
             type: 'potager-semis-backup',
-            version: 1,
+            version: 2,
             date: new Date().toISOString(),
             semis: semis,
             historique: historique
         };
 
         const json = JSON.stringify(data, null, 2);
-        const fileName = `POTA_Semis-backup-${new Date().toISOString().split('T')[0]}.json`;
+        const fileName = `POTA_Semis-backup-${todayISOSemis()}.json`;
         await saveAndShareFile(json, fileName);
         showToast('Export semis réussi ✓');
     } catch (err) {
@@ -4906,55 +5229,40 @@ async function exportSemisData() {
     }
 }
 
+// Prépare semis + historique d'un fichier (ancien ou nouveau format)
+async function preparerSemisImport(semisFichier, historiqueFichier) {
+    const semisLocaux = await getAllSemis();
+    const histLocaux = await getAllSemisHistorique();
+    const { items: semis, correspondance } = convertirImport(semisFichier, carteAnciensIds(semisLocaux));
+    const { items: historique } = convertirImport(historiqueFichier, carteAnciensIds(histLocaux));
+    corrigerSemisId(historique, correspondance);
+    return { semis, historique };
+}
+
 async function importSemisData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
     try {
-        const text = await file.text();
-        const data = JSON.parse(text);
+        const data = await lireFichierJSON(event);
+        if (data === null) return;
 
-        if (data.type !== 'potager-semis-backup') {
+        if (!data || data.type !== 'potager-semis-backup') {
             showToast('Fichier non reconnu');
             return;
         }
 
-        if (!confirm('Cela remplacera toutes vos données semis. Continuer ?')) {
-            event.target.value = '';
+        if (!confirm('Cela remplacera toutes vos données semis (bacs et historique).\nLe changement s\'appliquera à tous les appareils synchronisés. Continuer ?')) {
             return;
         }
 
-        // Vider semis
-        await new Promise((resolve, reject) => {
-            const tx = db.transaction('semis', 'readwrite');
-            tx.objectStore('semis').clear();
-            tx.oncomplete = () => resolve();
-            tx.onerror = () => reject(tx.error);
-        });
+        const { semis, historique } = await preparerSemisImport(data.semis, data.historique);
+        await remplacerStore('semis', semis);
+        await remplacerStore('semisHistorique', historique);
 
-        // Vider historique
-        await new Promise((resolve, reject) => {
-            const tx = db.transaction('semisHistorique', 'readwrite');
-            tx.objectStore('semisHistorique').clear();
-            tx.oncomplete = () => resolve();
-            tx.onerror = () => reject(tx.error);
-        });
-
-        // Importer
-        for (const s of (data.semis || [])) {
-            await addSemis(s);
-        }
-        for (const h of (data.historique || [])) {
-            await addSemisHistorique(h);
-        }
-
-        showToast('Import semis réussi ✓');
-        if (typeof loadSemisList === 'function') loadSemisList();
+        showToast(`Import semis réussi ✓ (${semis.length} bac(s))`);
+        if (currentMode === 'semis') retourListeSemis();
     } catch (err) {
         showToast('Erreur import semis');
         console.error(err);
     }
-    event.target.value = '';
 }
 
 // ===== Export / Import Conseils =====
@@ -4964,13 +5272,13 @@ async function exportConseilsData() {
         const conseils = await getAllConseils();
         const data = {
             type: 'potager-conseils-backup',
-            version: 1,
+            version: 2,
             date: new Date().toISOString(),
             conseils: conseils
         };
 
         const json = JSON.stringify(data, null, 2);
-        const fileName = `POTA_Conseil-backup-${new Date().toISOString().split('T')[0]}.json`;
+        const fileName = `POTA_Conseil-backup-${todayISOSemis()}.json`;
         await saveAndShareFile(json, fileName);
         showToast('Export conseils réussi ✓');
     } catch (err) {
@@ -4980,81 +5288,48 @@ async function exportConseilsData() {
 }
 
 async function importConseilsData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
     try {
-        const text = await file.text();
-        const data = JSON.parse(text);
+        const data = await lireFichierJSON(event);
+        if (data === null) return;
 
-        if (data.type !== 'potager-conseils-backup') {
+        if (!data || data.type !== 'potager-conseils-backup') {
             showToast('Fichier non reconnu');
             return;
         }
 
-        if (!confirm('Les conseils importés seront AJOUTÉS à vos conseils existants. Continuer ?')) {
-            event.target.value = '';
+        if (!confirm('Les conseils importés seront AJOUTÉS à vos conseils existants.\nLes ajouts seront aussi envoyés sur tous les appareils synchronisés. Continuer ?')) {
             return;
         }
 
-        let count = 0;
-        for (const c of (data.conseils || [])) {
-            const newConseil = { ...c };
-            delete newConseil.id;
-            await addConseil(newConseil);
-            count++;
-        }
+        const { ajoutes, maj } = await fusionnerStore('conseils', data.conseils || [],
+            c => `${(c.titre || '').trim()}|${(c.texte || '').trim()}`);
 
-        showToast(`${count} conseil(s) importé(s) ✓`);
+        showToast(`${ajoutes} conseil(s) importé(s) ✓` + (maj ? `, ${maj} mis à jour` : ''));
 
         if (currentMode === 'conseils') {
-            loadConseilsList();
+            showConseilView('liste');
         }
     } catch (err) {
         showToast('Erreur import conseils');
         console.error(err);
     }
-    event.target.value = '';
 }
 
 // ===== SAUVEGARDE COMPLÈTE =====
 async function exportTotal() {
     try {
-        const calendrier = await new Promise((resolve, reject) => {
-            const tx = db.transaction('events', 'readonly');
-            const req = tx.objectStore('events').getAll();
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject(req.error);
-        });
-
-        const semis = await new Promise((resolve, reject) => {
-            const tx = db.transaction('semis', 'readonly');
-            const req = tx.objectStore('semis').getAll();
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject(req.error);
-        });
-
-        const semisHistorique = await new Promise((resolve, reject) => {
-            const tx = db.transaction('semisHistorique', 'readonly');
-            const req = tx.objectStore('semisHistorique').getAll();
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject(req.error);
-        });
-
-        const conseils = await getAllConseils();
-
         const data = {
-            version: '1.0',
+            version: '2.0',
             type: 'potager-total',
             date: new Date().toISOString(),
-            calendrier,
-            semis,
-            semisHistorique,
-            conseils
+            calendrier: await getAllEvents(),
+            semis: await getAllSemis(),
+            semisHistorique: await getAllSemisHistorique(),
+            conseils: await getAllConseils()
         };
 
         const json = JSON.stringify(data, null, 2);
-        const fileName = `POTA_Complet-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        const fileName = `POTA_Complet-backup-${todayISOSemis()}.json`;
         await saveAndShareFile(json, fileName);
         showToast('📦 Export total effectué !');
     } catch (err) {
@@ -5064,89 +5339,224 @@ async function exportTotal() {
 }
 
 async function importTotal(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!confirm('⚠️ ATTENTION !\n\nCette action va ÉCRASER toutes vos données actuelles :\n• Calendrier\n• Semis + Historique\n• Conseils\n\nÊtes-vous sûr de vouloir continuer ?')) {
-        event.target.value = '';
-        return;
-    }
-
     try {
-        const text = await file.text();
-        const data = JSON.parse(text);
+        const data = await lireFichierJSON(event);
+        if (data === null) return;
 
-        if (data.type !== 'potager-total') {
+        if (!data || data.type !== 'potager-total') {
             showToast('❌ Fichier invalide : pas une sauvegarde complète');
-            event.target.value = '';
             return;
         }
 
-        const stores = [
-            { name: 'events', items: data.calendrier || [] },
-            { name: 'semis', items: data.semis || [] },
-            { name: 'semisHistorique', items: data.semisHistorique || [] },
-            { name: 'conseils', items: data.conseils || [] }
-        ];
-
-        for (const s of stores) {
-            await new Promise((resolve, reject) => {
-                const tx = db.transaction(s.name, 'readwrite');
-                const store = tx.objectStore(s.name);
-                store.clear();
-                for (const item of s.items) {
-                    store.put(item);
-                }
-                tx.oncomplete = resolve;
-                tx.onerror = () => reject(tx.error);
-            });
+        if (!confirm('⚠️ ATTENTION !\n\nCette action va ÉCRASER toutes vos données actuelles :\n• Calendrier\n• Semis + Historique\n• Conseils\n\nLe changement s\'appliquera à tous les appareils synchronisés.\n\nÊtes-vous sûr de vouloir continuer ?')) {
+            return;
         }
 
+        const { items: calendrier } = convertirImport(data.calendrier, carteAnciensIds(await getAllEvents()));
+        const { semis, historique } = await preparerSemisImport(data.semis, data.semisHistorique);
+        const { items: conseils } = convertirImport(data.conseils, carteAnciensIds(await getAllConseils()));
+
+        await remplacerStore('events', calendrier);
+        await remplacerStore('semis', semis);
+        await remplacerStore('semisHistorique', historique);
+        await remplacerStore('conseils', conseils);
+
         showToast('✅ Restauration complète effectuée !');
-        setTimeout(() => location.reload(), 1000);
+        closeDataPage();
+        showCalendarSection();
     } catch (err) {
         showToast('❌ Erreur de lecture du fichier');
         console.error(err);
     }
-    event.target.value = '';
 }
 
-// ===== Utilitaire =====
+// ==================== SYNCHRO MAISON ====================
 
-function escapeHTML(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+function ouvrirServeurMaison() {
+    if (window.SyncMaison && SyncMaison.instance) {
+        SyncMaison.ouvrirReglages();
+    } else {
+        toast('⚠️ Module de synchronisation indisponible');
+    }
+}
+
+// Changements reçus du serveur : [{ store, id, data }] (data === null → supprimé).
+// Écrits directement dans IndexedDB, SANS rappeler SyncMaison.
+async function appliquerChangementsSync(changements) {
+    const utiles = (changements || []).filter(ch => DATA_STORES.includes(ch.store));
+    if (!utiles.length) return;
+    const noms = [...new Set(utiles.map(ch => ch.store))];
+    const base = await openDB();
+    await new Promise((resolve, reject) => {
+        const tx = base.transaction(noms, 'readwrite');
+        for (const ch of utiles) {
+            const s = tx.objectStore(ch.store);
+            if (ch.data === null || ch.data === undefined) {
+                s.delete(String(ch.id)); // sans erreur si absent localement
+            } else {
+                s.put(Object.assign({}, ch.data, { id: String(ch.id) }));
+            }
+        }
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+    });
+    try {
+        await rafraichirApresSync(utiles);
+    } catch (e) {
+        console.warn('[POTA] Rafraîchissement après synchro :', e);
+    }
+}
+
+// Met à jour l'écran affiché après une synchro
+async function rafraichirApresSync(ch) {
+    const touche = (store) => ch.some(c => c.store === store);
+    const estSupprime = (store, id) => ch.some(c => c.store === store && String(c.id) === String(id) && c.data == null);
+    const estModifie = (store, id) => ch.some(c => c.store === store && String(c.id) === String(id));
+    const modalActive = (id) => document.getElementById(id).classList.contains('active');
+
+    // --- Calendrier ---
+    if (touche('events')) {
+        if (editingEventId !== null && estSupprime('events', editingEventId) && modalActive('eventModal')) {
+            closeEventModal();
+            toast('🗑️ Cette tâche a été supprimée sur un autre appareil');
+        }
+        let selectionChangee = false;
+        for (const id of [...multiSelected]) {
+            if (estSupprime('events', id)) { multiSelected.delete(id); selectionChangee = true; }
+        }
+        if (selectionChangee) document.getElementById('multiCount').textContent = `${multiSelected.size} sélectionné(s)`;
+        if (currentMode === 'calendar') {
+            if (currentMonth !== null) await renderMonthView();
+            else await renderCalendar();
+        }
+    }
+
+    // --- Semis ---
+    if ((touche('semis') || touche('semisHistorique')) && currentMode === 'semis') {
+        const vue = vueSemisVisible();
+        if (vue === 'semis-list-view') {
+            await loadSemisList();
+        } else if ((vue === 'semis-detail-view' || vue === 'semis-modifier-view') && currentSemisId) {
+            const semis = await getSemis(currentSemisId);
+            if (!semis) {
+                toast('🗑️ Ce bac a été supprimé sur un autre appareil');
+                currentSemisId = null;
+                retourListeSemis();
+            } else if (vue === 'semis-detail-view') {
+                if (entretienEnCours()) {
+                    // on garde la saisie en cours : seuls l'arrosage et l'historique sont rafraîchis
+                    await renderArrosageDetail(semis);
+                    await renderHistoriqueDetail(semis);
+                    if (estModifie('semis', currentSemisId)) toast('🔄 Ce bac a été modifié sur un autre appareil');
+                } else {
+                    await openSemisDetail(currentSemisId);
+                }
+            } else if (estModifie('semis', currentSemisId)) {
+                toast('🔄 Ce bac a été modifié sur un autre appareil');
+            }
+        }
+    }
+
+    // --- Conseils ---
+    if (touche('conseils') && currentMode === 'conseils') {
+        const visible = (id) => !document.getElementById(id).classList.contains('hidden');
+        if (visible('conseilsGrid')) {
+            await loadConseilsList();
+        } else if (currentConseilId !== null && (visible('conseil-detail-view') || visible('conseil-edition-view'))) {
+            if (estSupprime('conseils', currentConseilId)) {
+                toast('🗑️ Ce conseil a été supprimé sur un autre appareil');
+                currentConseilId = null;
+                showConseilView('liste');
+            } else if (estModifie('conseils', currentConseilId)) {
+                if (visible('conseil-detail-view')) await openConseilDetail(currentConseilId);
+                else toast('🔄 Ce conseil a été modifié sur un autre appareil');
+            }
+        }
+    }
+}
+
+function brancherSyncMaison() {
+    if (!window.SyncMaison) {
+        console.warn('[POTA] sync-maison.js absent : synchronisation désactivée');
+        return;
+    }
+    try {
+        SyncMaison.configurer({
+            app: 'pota',
+            nom: 'P.O.T.A',
+            mode: 'complet',
+            stores: DATA_STORES.slice(),
+            toutLire: (store) => dbGetAll(store),
+            appliquer: appliquerChangementsSync
+        });
+    } catch (err) {
+        console.error('[POTA] Synchro maison :', err);
+    }
 }
 
 // ==================== UTILS ====================
 function escapeHTML(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+  if (str === undefined || str === null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Argument texte pour un onclick="…" (les id ne sont plus des nombres)
+function jsArg(valeur) {
+  return escapeHTML(JSON.stringify(String(valeur)));
 }
 
 function truncate(str, len) {
+  str = String(str || '');
   return str.length > len ? str.substring(0, len) + '…' : str;
 }
 
+let toastMinuterie = null;
 function toast(msg) {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  clearTimeout(toastMinuterie);
+  toastMinuterie = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
 // ==================== INIT ====================
 async function init() {
   applyStoredTheme();
-  db = await openDB();
-  await autoUncheck();
-  renderCalendar();
+  setModeButton('semis');
+
+  // Stockage persistant : le navigateur n'efface pas les données en cas de manque de place
+  try {
+    if (navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist().catch(() => {});
+    }
+  } catch (_) { /* non pris en charge */ }
+
+  try {
+    db = await openDB();
+  } catch (err) {
+    console.error('[POTA] Ouverture de la base impossible :', err);
+    alert('⚠️ Impossible d\'ouvrir les données de P.O.T.A.\n\nVos données n\'ont pas été modifiées. Fermez les autres onglets de l\'appli puis rechargez la page.\n\n(' + (err && err.message || err) + ')');
+    return;
+  }
+
+  // La synchro est branchée avant toute écriture (ex. décochage automatique)
+  brancherSyncMaison();
+
+  // Affichage immédiat des données locales (la synchro ne bloque jamais)
+  await renderCalendar();
+  try { await autoUncheck(); } catch (e) { console.warn(e); }
+  if (currentMode === 'calendar' && currentMonth === null) renderCalendar();
 }
 
-init();
+document.addEventListener('DOMContentLoaded', init);
+
 // Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -5155,6 +5565,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('POTA SW erreur:', err));
   });
 }
+
 
 </script>
 </body>

@@ -1,7 +1,8 @@
-const CACHE_NAME = 'pota-v1.9';
+const CACHE_NAME = 'pota-v2.0';
 const ASSETS = [
   './',
   './index.html',
+  './sync-maison.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
@@ -26,13 +27,19 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if (!e.request.url.startsWith('http')) return;
+  const req = e.request;
+  // Seulement les fichiers de l'appli (même origine, GET).
+  // Les requêtes vers le serveur maison (PocketBase) ne passent jamais par le cache.
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      const fetched = fetch(e.request).then(response => {
+    caches.match(req).then(cached => {
+      const fetched = fetch(req).then(response => {
         if (response && response.status === 200 && response.type === 'basic') {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+          caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
         }
         return response;
       }).catch(() => cached);
