@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pota-v2.1';
+const CACHE_NAME = 'pota-v2.2';
 const FONTS_CACHE = 'pota-polices-v1';
 const ASSETS = [
   './',
