@@ -1,4 +1,5 @@
-const CACHE_NAME = 'pota-v2.0';
+const CACHE_NAME = 'pota-v2.1';
+const FONTS_CACHE = 'pota-polices-v1';
 const ASSETS = [
   './',
   './index.html',
@@ -19,7 +20,7 @@ self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME && k !== FONTS_CACHE).map(k => caches.delete(k))
       )
     )
   );
@@ -32,6 +33,20 @@ self.addEventListener('fetch', e => {
   // Les requêtes vers le serveur maison (PocketBase) ne passent jamais par le cache.
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+
+  // Polices Google : gardées en cache pour que l'appli reste jolie hors ligne
+  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+    e.respondWith(
+      caches.open(FONTS_CACHE).then(cache => cache.match(req).then(cached => cached ||
+        fetch(req).then(response => {
+          if (response && (response.ok || response.type === 'opaque')) cache.put(req, response.clone());
+          return response;
+        }).catch(() => cached)
+      ))
+    );
+    return;
+  }
+
   if (url.origin !== self.location.origin) return;
 
   e.respondWith(
